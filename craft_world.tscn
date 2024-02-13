@@ -1,0 +1,57 @@
+[gd_scene load_steps=7 format=3 uid="uid://c01t57ipowsp2"]
+
+[ext_resource type="Texture2D" uid="uid://dlvpc71pwsen4" path="res://astronaught/environs/craft interior.png" id="1_v7750"]
+[ext_resource type="PackedScene" uid="uid://diuf8t17xqt4m" path="res://player.tscn" id="2_vnxuu"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_gary8"]
+size = Vector2(1920.5, 20)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_3tapw"]
+size = Vector2(85.2813, 20)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_bdg60"]
+size = Vector2(26.3594, 473)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_5a3fj"]
+size = Vector2(26.3594, 150.375)
+
+[node name="Craft World" type="Node2D"]
+
+[node name="StaticBody2D" type="StaticBody2D" parent="."]
+position = Vector2(122, -304)
+
+[node name="Mid Floor" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(836.75, 832)
+shape = SubResource("RectangleShape2D_gary8")
+
+[node name="Bottom Floor" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(838, 996)
+shape = SubResource("RectangleShape2D_gary8")
+
+[node name="Top Floor" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(839, 675)
+shape = SubResource("RectangleShape2D_gary8")
+
+[node name="Ladder Block" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(-74.6406, 515)
+shape = SubResource("RectangleShape2D_3tapw")
+
+[node name="End wall 1" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(-133, 750.5)
+shape = SubResource("RectangleShape2D_bdg60")
+
+[node name="End wall 2" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(1810, 915.188)
+shape = SubResource("RectangleShape2D_5a3fj")
+
+[node name="End wall 3" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(1809, 592)
+shape = SubResource("RectangleShape2D_5a3fj")
+
+[node name="CraftInterior" type="Sprite2D" parent="."]
+position = Vector2(960, 540)
+texture = ExtResource("1_v7750")
+metadata/_edit_lock_ = true
+
+[node name="Player" parent="." instance=ExtResource("2_vnxuu")]
+position = Vector2(122, -304)

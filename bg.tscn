@@ -1,0 +1,12 @@
+[gd_scene load_steps=3 format=3 uid="uid://dnvl000j8bfm3"]
+
+[ext_resource type="Script" path="res://BG.gd" id="1_0i5s2"]
+[ext_resource type="Texture2D" uid="uid://yp0lisa8881u" path="res://astronaught/environs/new bg.png" id="2_u6x8k"]
+
+[node name="BG" type="ParallaxBackground"]
+script = ExtResource("1_0i5s2")
+
+[node name="Background" type="Sprite2D" parent="."]
+position = Vector2(960, 540)
+texture = ExtResource("2_u6x8k")
+metadata/_edit_lock_ = true

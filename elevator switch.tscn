@@ -1,0 +1,18 @@
+[gd_scene load_steps=4 format=3 uid="uid://dbbbwnx0jehlo"]
+
+[ext_resource type="Script" path="res://elevator switch.gd" id="1_3glk3"]
+[ext_resource type="Texture2D" uid="uid://dd27reji2agb3" path="res://astronaught/interior assets/elevator closed.png" id="2_mmrbi"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_xv3uo"]
+
+[node name="Switch" type="Area2D"]
+collision_layer = 256
+collision_mask = 0
+script = ExtResource("1_3glk3")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_mmrbi")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(-14, 12)
+shape = SubResource("RectangleShape2D_xv3uo")

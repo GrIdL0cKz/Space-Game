@@ -1,0 +1,283 @@
+[gd_scene load_steps=27 format=3 uid="uid://diuf8t17xqt4m"]
+
+[ext_resource type="Texture2D" uid="uid://bto25co3yryms" path="res://astronaught/Player/astro idle 1.png" id="1_5h5o1"]
+[ext_resource type="Texture2D" uid="uid://dksevsjejgrmv" path="res://astronaught/Player/astro damage 1.png" id="1_a1yv6"]
+[ext_resource type="Script" path="res://player.gd" id="1_b73v4"]
+[ext_resource type="Texture2D" uid="uid://jcs3xqqpt3f5" path="res://astronaught/Player/astro damage 2.png" id="2_3ov5g"]
+[ext_resource type="Texture2D" uid="uid://dahma7smjo4k2" path="res://astronaught/Player/astro 1 dead.png" id="3_jgo1x"]
+[ext_resource type="Texture2D" uid="uid://cd54ut4mbbp6l" path="res://astronaught/Player/astro idle 2.png" id="5_tvkco"]
+[ext_resource type="Texture2D" uid="uid://dsw6ypjqsuec7" path="res://astronaught/Player/astro idle 3.png" id="6_hhxa7"]
+[ext_resource type="Texture2D" uid="uid://bkn3qd8tt3d5n" path="res://astronaught/Player/astro jump 1.png" id="7_k085w"]
+[ext_resource type="Texture2D" uid="uid://077dxx6prslk" path="res://astronaught/Player/astro jump 2.png" id="8_ejg7h"]
+[ext_resource type="Texture2D" uid="uid://ce7iqjlebkbfo" path="res://astronaught/Player/astro walk right 1.png" id="9_c4ifa"]
+[ext_resource type="Texture2D" uid="uid://dx0bxbvo3rdmf" path="res://astronaught/Player/astro walk right 2.png" id="10_qhbym"]
+[ext_resource type="Texture2D" uid="uid://8ij2gh42qq0r" path="res://astronaught/Player/astro walk right 3.png" id="11_2sph4"]
+[ext_resource type="Texture2D" uid="uid://0ea55fbtkl1v" path="res://astronaught/Player/astro walk right 4.png" id="12_e88bl"]
+[ext_resource type="Texture2D" uid="uid://dw8np72ylqp4c" path="res://astronaught/Player/astro walk right no helm 1.png" id="13_a4o5f"]
+[ext_resource type="Texture2D" uid="uid://c47yorwlcqlw5" path="res://astronaught/Player/astro walk right no helm 2.png" id="14_ojoi0"]
+[ext_resource type="Texture2D" uid="uid://cpoix1qcb6fee" path="res://astronaught/Player/astro walk right no helm 3.png" id="15_wbh5h"]
+[ext_resource type="Texture2D" uid="uid://dj1luaqhkqkn7" path="res://astronaught/Player/astro walk right no helm 4.png" id="16_lvfiw"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_sw4uv"]
+size = Vector2(62, 120)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_abh1d"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_a1yv6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_3ov5g")
+}],
+"loop": true,
+"name": &"Damage",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_jgo1x")
+}],
+"loop": true,
+"name": &"Death",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_5h5o1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_tvkco")
+}, {
+"duration": 1.0,
+"texture": ExtResource("1_5h5o1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_hhxa7")
+}],
+"loop": true,
+"name": &"Idle",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("7_k085w")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_ejg7h")
+}],
+"loop": true,
+"name": &"Jump",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("9_c4ifa")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_qhbym")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_2sph4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_e88bl")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_c4ifa")
+}],
+"loop": true,
+"name": &"Run",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("13_a4o5f")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_ojoi0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_wbh5h")
+}, {
+"duration": 1.0,
+"texture": ExtResource("16_lvfiw")
+}],
+"loop": true,
+"name": &"RunFree",
+"speed": 5.0
+}]
+
+[sub_resource type="Animation" id="Animation_lnjop"]
+resource_name = "Death"
+length = 30.0
+loop_mode = 1
+
+[sub_resource type="Animation" id="Animation_4t36x"]
+resource_name = "Idle"
+length = 30.0
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite2D:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.4),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [&"Idle"]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("AnimatedSprite2D:frame")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.4, 10.1, 20.1),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [0, 1, 3]
+}
+
+[sub_resource type="Animation" id="Animation_fgwdl"]
+resource_name = "Jump"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite2D:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [&"Jump"]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("AnimatedSprite2D:frame")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [0, 1]
+}
+
+[sub_resource type="Animation" id="Animation_u8bn4"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite2D:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [&"Idle"]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("AnimatedSprite2D:frame")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+
+[sub_resource type="Animation" id="Animation_ocpuy"]
+resource_name = "Run"
+length = 0.8
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite2D:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [&"Run"]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("AnimatedSprite2D:frame")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4, 0.6, 0.8),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 3, 2, 4]
+}
+
+[sub_resource type="Animation" id="Animation_rdprr"]
+resource_name = "RunLeft"
+length = 0.8
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite2D:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [&"RunLeft"]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("AnimatedSprite2D:frame")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4, 0.6, 0.8),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 3, 4, 4]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_bair4"]
+_data = {
+"Death": SubResource("Animation_lnjop"),
+"Idle": SubResource("Animation_4t36x"),
+"Jump": SubResource("Animation_fgwdl"),
+"RESET": SubResource("Animation_u8bn4"),
+"Run": SubResource("Animation_ocpuy"),
+"RunLeft": SubResource("Animation_rdprr")
+}
+
+[node name="Player" type="CharacterBody2D"]
+script = ExtResource("1_b73v4")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(872, 759)
+shape = SubResource("RectangleShape2D_sw4uv")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(878.75, 758.25)
+scale = Vector2(1.13021, 1.25521)
+sprite_frames = SubResource("SpriteFrames_abh1d")
+animation = &"Idle"
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_bair4")
+}
+autoplay = "Idle"
