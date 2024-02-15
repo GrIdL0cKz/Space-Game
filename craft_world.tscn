@@ -1,7 +1,8 @@
-[gd_scene load_steps=7 format=3 uid="uid://c01t57ipowsp2"]
+[gd_scene load_steps=8 format=3 uid="uid://c01t57ipowsp2"]
 
 [ext_resource type="Texture2D" uid="uid://dlvpc71pwsen4" path="res://astronaught/environs/craft interior.png" id="1_v7750"]
 [ext_resource type="PackedScene" uid="uid://diuf8t17xqt4m" path="res://player.tscn" id="2_vnxuu"]
+[ext_resource type="PackedScene" uid="uid://dbbbwnx0jehlo" path="res://elevator switch.tscn" id="3_gp4qo"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_gary8"]
 size = Vector2(1920.5, 20)
@@ -16,6 +17,14 @@ size = Vector2(26.3594, 473)
 size = Vector2(26.3594, 150.375)
 
 [node name="Craft World" type="Node2D"]
+
+[node name="CraftInterior" type="Sprite2D" parent="."]
+position = Vector2(960, 540)
+texture = ExtResource("1_v7750")
+metadata/_edit_lock_ = true
+
+[node name="Player" parent="." instance=ExtResource("2_vnxuu")]
+position = Vector2(371, 661)
 
 [node name="StaticBody2D" type="StaticBody2D" parent="."]
 position = Vector2(122, -304)
@@ -48,10 +57,5 @@ shape = SubResource("RectangleShape2D_5a3fj")
 position = Vector2(1809, 592)
 shape = SubResource("RectangleShape2D_5a3fj")
 
-[node name="CraftInterior" type="Sprite2D" parent="."]
-position = Vector2(960, 540)
-texture = ExtResource("1_v7750")
-metadata/_edit_lock_ = true
-
-[node name="Player" parent="." instance=ExtResource("2_vnxuu")]
-position = Vector2(122, -304)
+[node name="Switch" parent="." instance=ExtResource("3_gp4qo")]
+position = Vector2(1115, 590)

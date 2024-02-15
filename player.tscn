@@ -267,11 +267,11 @@ _data = {
 script = ExtResource("1_b73v4")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(872, 759)
+position = Vector2(0, -55)
 shape = SubResource("RectangleShape2D_sw4uv")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
-position = Vector2(878.75, 758.25)
+position = Vector2(0, -53)
 scale = Vector2(1.13021, 1.25521)
 sprite_frames = SubResource("SpriteFrames_abh1d")
 animation = &"Idle"
