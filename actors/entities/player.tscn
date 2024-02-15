@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://bto25co3yryms" path="res://astronaught/Player/astro idle 1.png" id="1_5h5o1"]
 [ext_resource type="Texture2D" uid="uid://dksevsjejgrmv" path="res://astronaught/Player/astro damage 1.png" id="1_a1yv6"]
-[ext_resource type="Script" path="res://player.gd" id="1_b73v4"]
+[ext_resource type="Script" path="res://actors/entities/player.gd" id="1_b73v4"]
 [ext_resource type="Texture2D" uid="uid://jcs3xqqpt3f5" path="res://astronaught/Player/astro damage 2.png" id="2_3ov5g"]
 [ext_resource type="Texture2D" uid="uid://dahma7smjo4k2" path="res://astronaught/Player/astro 1 dead.png" id="3_jgo1x"]
 [ext_resource type="Texture2D" uid="uid://cd54ut4mbbp6l" path="res://astronaught/Player/astro idle 2.png" id="5_tvkco"]

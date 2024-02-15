@@ -1,25 +1,26 @@
 ea4bc82a6ad023ab7ee23ee620429895
-::res://::1707998089
+::res://::1707998255
 BG.gd::GDScript::-1::1707950277::0::1::::<>ParallaxBackground<>::
 bg.tscn::PackedScene::8115782835133960384::1707995026::0::1::::<><>::res://BG.gd<>uid://yp0lisa8881u::::res://astronaught/environs/new bg.png
-craft_world.tscn::PackedScene::6582445170429041617::1707997702::0::1::::<><>::uid://dlvpc71pwsen4::::res://astronaught/environs/craft interior.png<>uid://diuf8t17xqt4m::::res://player.tscn<>uid://dbbbwnx0jehlo::::res://elevator switch.tscn
-elevator switch.gd::GDScript::-1::1707998047::0::1::::<>Area2D<>::
-elevator switch.tscn::PackedScene::7231615996412201264::1707995054::0::1::::<><>::res://elevator switch.gd<>uid://dd27reji2agb3::::res://astronaught/interior assets/elevator closed.png
 icon.svg::CompressedTexture2D::8970406488569791489::1707950278::1707998090::1::::<><>::
-main.gd::GDScript::-1::1707950278::0::1::::<>Node2D<>::
-main.tscn::PackedScene::9125783601762597197::1707995026::0::1::::<><>::res://main.gd<>uid://dnvl000j8bfm3::::res://bg.tscn
 ParallaxBackground.gd::GDScript::-1::1707950277::0::1::::<>ParallaxBackground<>::
-player.gd::GDScript::-1::1707997770::0::1::::<>CharacterBody2D<>::
-player.tscn::PackedScene::7762423911021340322::1707997770::0::1::::<><>::uid://bto25co3yryms::::res://astronaught/Player/astro idle 1.png<>uid://dksevsjejgrmv::::res://astronaught/Player/astro damage 1.png<>res://player.gd<>uid://jcs3xqqpt3f5::::res://astronaught/Player/astro damage 2.png<>uid://dahma7smjo4k2::::res://astronaught/Player/astro 1 dead.png<>uid://cd54ut4mbbp6l::::res://astronaught/Player/astro idle 2.png<>uid://dsw6ypjqsuec7::::res://astronaught/Player/astro idle 3.png<>uid://bkn3qd8tt3d5n::::res://astronaught/Player/astro jump 1.png<>uid://077dxx6prslk::::res://astronaught/Player/astro jump 2.png<>uid://ce7iqjlebkbfo::::res://astronaught/Player/astro walk right 1.png<>uid://dx0bxbvo3rdmf::::res://astronaught/Player/astro walk right 2.png<>uid://8ij2gh42qq0r::::res://astronaught/Player/astro walk right 3.png<>uid://0ea55fbtkl1v::::res://astronaught/Player/astro walk right 4.png<>uid://dw8np72ylqp4c::::res://astronaught/Player/astro walk right no helm 1.png<>uid://c47yorwlcqlw5::::res://astronaught/Player/astro walk right no helm 2.png<>uid://cpoix1qcb6fee::::res://astronaught/Player/astro walk right no helm 3.png<>uid://dj1luaqhkqkn7::::res://astronaught/Player/astro walk right no helm 4.png
 README.md::TextFile::-1::1707950277::0::1::::<><>::
 SpaceBg.gd::GDScript::-1::1707950277::0::1::::<>Sprite2D<>::
-::res://astronaught/::1707998078
+::res://actors/::1707998261
+player.gd::GDScript::-1::1707997770::0::1::::<>CharacterBody2D<>::
+player.tscn::PackedScene::7762423911021340322::1707998255::0::1::::<><>::uid://bto25co3yryms::::res://astronaught/Player/astro idle 1.png<>uid://dksevsjejgrmv::::res://astronaught/Player/astro damage 1.png<>res://actors/player.gd<>uid://jcs3xqqpt3f5::::res://astronaught/Player/astro damage 2.png<>uid://dahma7smjo4k2::::res://astronaught/Player/astro 1 dead.png<>uid://cd54ut4mbbp6l::::res://astronaught/Player/astro idle 2.png<>uid://dsw6ypjqsuec7::::res://astronaught/Player/astro idle 3.png<>uid://bkn3qd8tt3d5n::::res://astronaught/Player/astro jump 1.png<>uid://077dxx6prslk::::res://astronaught/Player/astro jump 2.png<>uid://ce7iqjlebkbfo::::res://astronaught/Player/astro walk right 1.png<>uid://dx0bxbvo3rdmf::::res://astronaught/Player/astro walk right 2.png<>uid://8ij2gh42qq0r::::res://astronaught/Player/astro walk right 3.png<>uid://0ea55fbtkl1v::::res://astronaught/Player/astro walk right 4.png<>uid://dw8np72ylqp4c::::res://astronaught/Player/astro walk right no helm 1.png<>uid://c47yorwlcqlw5::::res://astronaught/Player/astro walk right no helm 2.png<>uid://cpoix1qcb6fee::::res://astronaught/Player/astro walk right no helm 3.png<>uid://dj1luaqhkqkn7::::res://astronaught/Player/astro walk right no helm 4.png
+::res://actors/components/::1707998180
+::res://actors/entities/::1707998261
+::res://actors/objects/::1707998232
+elevator switch.gd::GDScript::-1::1707998047::0::1::::<>Area2D<>::
+elevator switch.tscn::PackedScene::7231615996412201264::1707998232::0::1::::<><>::res://actors/objects/elevator switch.gd<>uid://dd27reji2agb3::::res://astronaught/interior assets/elevator closed.png
+::res://astronaught/::1707998090
 mouse 1.png::CompressedTexture2D::2914037022505439125::1707950278::1707998090::1::::<><>::
 mouse.png::CompressedTexture2D::5140475828153431647::1707950278::1707998090::1::::<><>::
-::res://astronaught/environs/::1707998078
+::res://astronaught/environs/::1707998091
 craft interior.png::CompressedTexture2D::7975607312035984183::1707950277::1707998090::1::::<><>::
 new bg.png::CompressedTexture2D::1717035930214505124::1707950277::1707998091::1::::<><>::
-::res://astronaught/interior assets/::1707998078
+::res://astronaught/interior assets/::1707998090
 door closed.png::CompressedTexture2D::641567896336349419::1707950278::1707998090::1::::<><>::
 door fully open.png::CompressedTexture2D::6763541852557684312::1707950278::1707998090::1::::<><>::
 door half open.png::CompressedTexture2D::4700148487059089709::1707950278::1707998090::1::::<><>::
@@ -30,7 +31,7 @@ elevator half.png::CompressedTexture2D::3077308776418292673::1707950278::1707998
 elevator idle.png::CompressedTexture2D::1855377252254026644::1707950278::1707998090::1::::<><>::
 elevator insane.png::CompressedTexture2D::6019347043202024568::1707950278::1707998090::1::::<><>::
 elevator open.png::CompressedTexture2D::4149689530481865985::1707950278::1707998090::1::::<><>::
-::res://astronaught/Player/::1707998078
+::res://astronaught/Player/::1707998090
 astro 1 dead.png::CompressedTexture2D::7174443008382439523::1707950277::1707998090::1::::<><>::
 astro damage 1.png::CompressedTexture2D::7898590616193338609::1707950277::1707998090::1::::<><>::
 astro damage 2.png::CompressedTexture2D::636972489851259584::1707950277::1707998090::1::::<><>::
@@ -58,7 +59,7 @@ astro walk right no helm 1.png::CompressedTexture2D::8772358908377246600::170795
 astro walk right no helm 2.png::CompressedTexture2D::6875861057345872054::1707950277::1707998090::1::::<><>::
 astro walk right no helm 3.png::CompressedTexture2D::5855103510132874984::1707950277::1707998090::1::::<><>::
 astro walk right no helm 4.png::CompressedTexture2D::7845339093274600706::1707950277::1707998090::1::::<><>::
-::res://astronaught/stars/::1707998078
+::res://astronaught/stars/::1707998090
 planet 1.png::CompressedTexture2D::3656983671790082838::1707950278::1707998090::1::::<><>::
 planet 2.png::CompressedTexture2D::2774264986535517028::1707950278::1707998090::1::::<><>::
 planet 3.png::CompressedTexture2D::6323380716579478167::1707950278::1707998090::1::::<><>::
@@ -67,3 +68,7 @@ star 2.png::CompressedTexture2D::5935253759869803265::1707950278::1707998090::1:
 star 3.png::CompressedTexture2D::6440617857144471184::1707950278::1707998090::1::::<><>::
 star blink 1.png::CompressedTexture2D::6918700983869937612::1707950278::1707998090::1::::<><>::
 star blink 2.png::CompressedTexture2D::1095587894304960178::1707950278::1707998090::1::::<><>::
+::res://scenes/::1707998255
+craft_world.tscn::PackedScene::6582445170429041617::1707998265::0::1::::<><>::uid://dlvpc71pwsen4::::res://astronaught/environs/craft interior.png<>uid://diuf8t17xqt4m::::res://actors/player.tscn<>uid://dbbbwnx0jehlo::::res://actors/objects/elevator switch.tscn
+main.gd::GDScript::-1::1707950278::0::1::::<>Node2D<>::
+main.tscn::PackedScene::9125783601762597197::1707998251::0::1::::<><>::res://scenes/main.gd<>uid://dnvl000j8bfm3::::res://bg.tscn
