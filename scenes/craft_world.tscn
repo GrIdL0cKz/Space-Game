@@ -1,5 +1,6 @@
-[gd_scene load_steps=8 format=3 uid="uid://c01t57ipowsp2"]
+[gd_scene load_steps=9 format=3 uid="uid://c01t57ipowsp2"]
 
+[ext_resource type="Script" path="res://scenes/craft_world.gd" id="1_6rm0f"]
 [ext_resource type="Texture2D" uid="uid://dlvpc71pwsen4" path="res://astronaught/environs/craft interior.png" id="1_gd5g2"]
 [ext_resource type="PackedScene" uid="uid://diuf8t17xqt4m" path="res://actors/entities/player.tscn" id="2_vsmtb"]
 [ext_resource type="PackedScene" uid="uid://dbbbwnx0jehlo" path="res://actors/objects/Elevator.tscn" id="3_5aexy"]
@@ -17,6 +18,7 @@ size = Vector2(26.3594, 473)
 size = Vector2(26.3594, 150.375)
 
 [node name="Craft World" type="Node2D"]
+script = ExtResource("1_6rm0f")
 
 [node name="CraftInterior" type="Sprite2D" parent="."]
 position = Vector2(960, 540)
@@ -28,9 +30,11 @@ position = Vector2(1115, 590)
 
 [node name="Elevator2" parent="." instance=ExtResource("3_5aexy")]
 position = Vector2(1115, 424)
+floor_number = 2
 
 [node name="Elevator3" parent="." instance=ExtResource("3_5aexy")]
 position = Vector2(1115, 267)
+floor_number = 3
 
 [node name="Player" parent="." instance=ExtResource("2_vsmtb")]
 position = Vector2(371, 661)
