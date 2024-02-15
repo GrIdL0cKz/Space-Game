@@ -1,0 +1,73 @@
+[gd_scene load_steps=5 format=3 uid="uid://p6djvpno1ml2"]
+
+[ext_resource type="PackedScene" uid="uid://c78rbp1smyjkj" path="res://actors/ui/popups/PopupBase.tscn" id="1_kyev6"]
+[ext_resource type="Script" path="res://actors/ui/popups/ElevatorFloorSelectView.gd" id="2_bhtip"]
+[ext_resource type="PackedScene" uid="uid://dyox771wknh24" path="res://actors/ui/FloorDisplay.tscn" id="2_v27f0"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_773js"]
+
+[node name="PopupBase" instance=ExtResource("1_kyev6")]
+
+[node name="Panel" type="Panel" parent="." index="0"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 595.0
+offset_top = 301.0
+offset_right = -595.0
+offset_bottom = -301.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_773js")
+script = ExtResource("2_bhtip")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel" index="0"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 69.0
+offset_top = 70.0
+offset_right = -69.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="Panel/VBoxContainer" index="0"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Select Floor"
+horizontal_alignment = 1
+
+[node name="CenterContainer" type="CenterContainer" parent="Panel/VBoxContainer" index="1"]
+layout_mode = 2
+
+[node name="Grid" type="GridContainer" parent="Panel/VBoxContainer/CenterContainer" index="0"]
+layout_mode = 2
+columns = 3
+
+[node name="FloorDisplay" parent="Panel/VBoxContainer/CenterContainer/Grid" index="0" instance=ExtResource("2_v27f0")]
+layout_mode = 2
+
+[node name="FloorDisplay2" parent="Panel/VBoxContainer/CenterContainer/Grid" index="1" instance=ExtResource("2_v27f0")]
+layout_mode = 2
+floor_number = 2
+
+[node name="FloorDisplay3" parent="Panel/VBoxContainer/CenterContainer/Grid" index="2" instance=ExtResource("2_v27f0")]
+layout_mode = 2
+floor_number = 3
+
+[node name="Close" type="Button" parent="Panel" index="1"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -111.0
+offset_top = 20.0
+offset_right = -23.0
+offset_bottom = 81.0
+grow_horizontal = 0
+text = "Close"
+
+[connection signal="pressed" from="Panel/Close" to="Panel" method="_on_close_pressed"]

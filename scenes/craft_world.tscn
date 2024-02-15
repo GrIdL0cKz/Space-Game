@@ -1,7 +1,9 @@
-[gd_scene load_steps=7 format=3 uid="uid://c01t57ipowsp2"]
+[gd_scene load_steps=9 format=3 uid="uid://c01t57ipowsp2"]
 
-[ext_resource type="Texture2D" uid="uid://dlvpc71pwsen4" path="res://astronaught/environs/craft interior.png" id="1_v7750"]
-[ext_resource type="PackedScene" uid="uid://diuf8t17xqt4m" path="res://player.tscn" id="2_vnxuu"]
+[ext_resource type="Script" path="res://scenes/craft_world.gd" id="1_6rm0f"]
+[ext_resource type="Texture2D" uid="uid://dlvpc71pwsen4" path="res://astronaught/environs/craft interior.png" id="1_gd5g2"]
+[ext_resource type="PackedScene" uid="uid://diuf8t17xqt4m" path="res://actors/entities/player.tscn" id="2_vsmtb"]
+[ext_resource type="PackedScene" uid="uid://dbbbwnx0jehlo" path="res://actors/objects/Elevator.tscn" id="3_5aexy"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_gary8"]
 size = Vector2(1920.5, 20)
@@ -16,6 +18,26 @@ size = Vector2(26.3594, 473)
 size = Vector2(26.3594, 150.375)
 
 [node name="Craft World" type="Node2D"]
+script = ExtResource("1_6rm0f")
+
+[node name="CraftInterior" type="Sprite2D" parent="."]
+position = Vector2(960, 540)
+texture = ExtResource("1_gd5g2")
+metadata/_edit_lock_ = true
+
+[node name="Elevator" parent="." instance=ExtResource("3_5aexy")]
+position = Vector2(1115, 590)
+
+[node name="Elevator2" parent="." instance=ExtResource("3_5aexy")]
+position = Vector2(1115, 424)
+floor_number = 2
+
+[node name="Elevator3" parent="." instance=ExtResource("3_5aexy")]
+position = Vector2(1115, 267)
+floor_number = 3
+
+[node name="Player" parent="." instance=ExtResource("2_vsmtb")]
+position = Vector2(371, 661)
 
 [node name="StaticBody2D" type="StaticBody2D" parent="."]
 position = Vector2(122, -304)
@@ -47,11 +69,3 @@ shape = SubResource("RectangleShape2D_5a3fj")
 [node name="End wall 3" type="CollisionShape2D" parent="StaticBody2D"]
 position = Vector2(1809, 592)
 shape = SubResource("RectangleShape2D_5a3fj")
-
-[node name="CraftInterior" type="Sprite2D" parent="."]
-position = Vector2(960, 540)
-texture = ExtResource("1_v7750")
-metadata/_edit_lock_ = true
-
-[node name="Player" parent="." instance=ExtResource("2_vnxuu")]
-position = Vector2(122, -304)
