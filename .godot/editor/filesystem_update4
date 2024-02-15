@@ -1,2 +1,7 @@
 res://craft_world.tscn
 res://scenes/craft_world.tscn
+res://actors/objects/elevator switch.tscn
+res://actors/objects/elevator switch.gd
+res://scenes/main.tscn
+res://scenes/main.gd
+res://actors/entities/player.tscn

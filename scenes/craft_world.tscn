@@ -23,6 +23,9 @@ position = Vector2(960, 540)
 texture = ExtResource("1_gd5g2")
 metadata/_edit_lock_ = true
 
+[node name="Switch" parent="." instance=ExtResource("3_5aexy")]
+position = Vector2(1115, 590)
+
 [node name="Player" parent="." instance=ExtResource("2_vsmtb")]
 position = Vector2(371, 661)
 
@@ -56,6 +59,3 @@ shape = SubResource("RectangleShape2D_5a3fj")
 [node name="End wall 3" type="CollisionShape2D" parent="StaticBody2D"]
 position = Vector2(1809, 592)
 shape = SubResource("RectangleShape2D_5a3fj")
-
-[node name="Switch" parent="." instance=ExtResource("3_5aexy")]
-position = Vector2(1115, 590)
