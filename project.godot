@@ -73,6 +73,11 @@ interact={
 
 pointing/emulate_touch_from_mouse=true
 
+[layer_names]
+
+2d_physics/layer_1="ElevatorArea"
+2d_physics/layer_2="PlayerBody"
+
 [rendering]
 
 renderer/rendering_method="gl_compatibility"

@@ -21,3 +21,10 @@ func _on_input_event(viewport, event, shape_idx):
 		is_open = !is_open
 		
 		elevator_press.emit()
+
+
+func _on_area_2d_body_entered(body):
+	if is_open:
+		var i = load('res://actors/ui/popups/ElevatorFloorSelectView.tscn').instantiate()
+		
+		ManagerGame.global_player_ui_ref.pop_to_ui(i)
