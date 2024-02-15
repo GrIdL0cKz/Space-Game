@@ -1,6 +1,6 @@
 [gd_scene load_steps=7 format=3 uid="uid://dbbbwnx0jehlo"]
 
-[ext_resource type="Script" path="res://actors/objects/elevator switch.gd" id="1_3glk3"]
+[ext_resource type="Script" path="res://actors/objects/Elevator.gd" id="1_3glk3"]
 [ext_resource type="Texture2D" uid="uid://dd27reji2agb3" path="res://astronaught/interior assets/elevator closed.png" id="2_mmrbi"]
 [ext_resource type="Texture2D" uid="uid://b0ee1sarmjywn" path="res://astronaught/interior assets/elevator open.png" id="3_v8vls"]
 [ext_resource type="Texture2D" uid="uid://bj3w3c2a65b2h" path="res://astronaught/interior assets/elevator half.png" id="4_f0hol"]
@@ -46,7 +46,7 @@ animations = [{
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_xv3uo"]
 
-[node name="Switch" type="Area2D"]
+[node name="Elevator" type="Area2D"]
 collision_layer = 256
 collision_mask = 0
 script = ExtResource("1_3glk3")

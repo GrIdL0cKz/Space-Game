@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://dlvpc71pwsen4" path="res://astronaught/environs/craft interior.png" id="1_gd5g2"]
 [ext_resource type="PackedScene" uid="uid://diuf8t17xqt4m" path="res://actors/entities/player.tscn" id="2_vsmtb"]
-[ext_resource type="PackedScene" uid="uid://dbbbwnx0jehlo" path="res://actors/objects/elevator switch.tscn" id="3_5aexy"]
+[ext_resource type="PackedScene" uid="uid://dbbbwnx0jehlo" path="res://actors/objects/Elevator.tscn" id="3_5aexy"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_gary8"]
 size = Vector2(1920.5, 20)
@@ -23,8 +23,14 @@ position = Vector2(960, 540)
 texture = ExtResource("1_gd5g2")
 metadata/_edit_lock_ = true
 
-[node name="Switch" parent="." instance=ExtResource("3_5aexy")]
+[node name="Elevator" parent="." instance=ExtResource("3_5aexy")]
 position = Vector2(1115, 590)
+
+[node name="Elevator2" parent="." instance=ExtResource("3_5aexy")]
+position = Vector2(1115, 424)
+
+[node name="Elevator3" parent="." instance=ExtResource("3_5aexy")]
+position = Vector2(1115, 267)
 
 [node name="Player" parent="." instance=ExtResource("2_vsmtb")]
 position = Vector2(371, 661)
