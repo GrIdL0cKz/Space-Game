@@ -1,0 +1,57 @@
+[gd_scene load_steps=6 format=3 uid="uid://beumjs7pgpdrn"]
+
+[ext_resource type="Texture2D" uid="uid://kkhumccuyg74" path="res://assets/fx/extend.png" id="1_35ldr"]
+[ext_resource type="Script" path="res://actors/objects/Lamp.gd" id="2_hp0bd"]
+
+[sub_resource type="Animation" id="Animation_gsoag"]
+resource_name = "flicker"
+length = 0.4
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 1,
+"values": [true, false, true, false, true]
+}
+
+[sub_resource type="Animation" id="Animation_jl2oi"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_v5sqq"]
+_data = {
+"RESET": SubResource("Animation_jl2oi"),
+"flicker": SubResource("Animation_gsoag")
+}
+
+[node name="Lamp" type="PointLight2D"]
+energy = 0.67
+shadow_enabled = true
+texture = ExtResource("1_35ldr")
+texture_scale = 2.75
+script = ExtResource("2_hp0bd")
+
+[node name="Timer" type="Timer" parent="."]
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_v5sqq")
+}
+
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]
