@@ -95,7 +95,11 @@ position = Vector2(0, -317)
 occluder = SubResource("OccluderPolygon2D_trxjs")
 
 [node name="Lamp" parent="Lights" instance=ExtResource("5_a1428")]
-position = Vector2(586, 604)
+position = Vector2(976, 604)
+can_flicker = true
+
+[node name="Lamp2" parent="Lights" instance=ExtResource("5_a1428")]
+position = Vector2(230, 604)
 can_flicker = true
 
 [node name="Lamp3" parent="Lights" instance=ExtResource("5_a1428")]
@@ -114,6 +118,3 @@ can_flicker = true
 
 [node name="Lamp7" parent="Lights" instance=ExtResource("5_a1428")]
 position = Vector2(311, 287)
-
-[node name="Lamp2" parent="Lights" instance=ExtResource("5_a1428")]
-position = Vector2(1347, 607)
