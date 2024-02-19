@@ -21,6 +21,8 @@ func _on_input_event(viewport, event, shape_idx):
 		is_open = !is_open
 		
 		elevator_press.emit()
+		
+		get_viewport().set_input_as_handled()
 
 
 func _on_area_2d_body_entered(body):

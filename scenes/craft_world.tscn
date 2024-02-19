@@ -1,9 +1,10 @@
-[gd_scene load_steps=9 format=3 uid="uid://c01t57ipowsp2"]
+[gd_scene load_steps=11 format=3 uid="uid://c01t57ipowsp2"]
 
 [ext_resource type="Script" path="res://scenes/craft_world.gd" id="1_6rm0f"]
 [ext_resource type="Texture2D" uid="uid://dlvpc71pwsen4" path="res://astronaught/environs/craft interior.png" id="1_gd5g2"]
 [ext_resource type="PackedScene" uid="uid://diuf8t17xqt4m" path="res://actors/entities/player.tscn" id="2_vsmtb"]
 [ext_resource type="PackedScene" uid="uid://dbbbwnx0jehlo" path="res://actors/objects/Elevator.tscn" id="3_5aexy"]
+[ext_resource type="PackedScene" uid="uid://beumjs7pgpdrn" path="res://actors/objects/Lamp.tscn" id="5_a1428"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_gary8"]
 size = Vector2(1920.5, 20)
@@ -17,8 +18,14 @@ size = Vector2(26.3594, 473)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_5a3fj"]
 size = Vector2(26.3594, 150.375)
 
+[sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_trxjs"]
+polygon = PackedVector2Array(3, 537, 1920, 539, 1918, 513, -1, 516)
+
 [node name="Craft World" type="Node2D"]
 script = ExtResource("1_6rm0f")
+
+[node name="CanvasModulate" type="CanvasModulate" parent="."]
+color = Color(0.266667, 0.266667, 0.266667, 1)
 
 [node name="CraftInterior" type="Sprite2D" parent="."]
 position = Vector2(960, 540)
@@ -69,3 +76,45 @@ shape = SubResource("RectangleShape2D_5a3fj")
 [node name="End wall 3" type="CollisionShape2D" parent="StaticBody2D"]
 position = Vector2(1809, 592)
 shape = SubResource("RectangleShape2D_5a3fj")
+
+[node name="Lights" type="Node2D" parent="."]
+
+[node name="LightOccluder2D" type="LightOccluder2D" parent="Lights"]
+occluder = SubResource("OccluderPolygon2D_trxjs")
+
+[node name="LightOccluder2D2" type="LightOccluder2D" parent="Lights"]
+position = Vector2(0, 163)
+occluder = SubResource("OccluderPolygon2D_trxjs")
+
+[node name="LightOccluder2D3" type="LightOccluder2D" parent="Lights"]
+position = Vector2(0, -159)
+occluder = SubResource("OccluderPolygon2D_trxjs")
+
+[node name="LightOccluder2D4" type="LightOccluder2D" parent="Lights"]
+position = Vector2(0, -317)
+occluder = SubResource("OccluderPolygon2D_trxjs")
+
+[node name="Lamp" parent="Lights" instance=ExtResource("5_a1428")]
+position = Vector2(976, 604)
+can_flicker = true
+
+[node name="Lamp2" parent="Lights" instance=ExtResource("5_a1428")]
+position = Vector2(230, 604)
+can_flicker = true
+
+[node name="Lamp3" parent="Lights" instance=ExtResource("5_a1428")]
+position = Vector2(586, 433)
+
+[node name="Lamp4" parent="Lights" instance=ExtResource("5_a1428")]
+position = Vector2(1344, 433)
+
+[node name="Lamp5" parent="Lights" instance=ExtResource("5_a1428")]
+position = Vector2(1751, 287)
+can_flicker = true
+
+[node name="Lamp6" parent="Lights" instance=ExtResource("5_a1428")]
+position = Vector2(1039, 287)
+can_flicker = true
+
+[node name="Lamp7" parent="Lights" instance=ExtResource("5_a1428")]
+position = Vector2(311, 287)

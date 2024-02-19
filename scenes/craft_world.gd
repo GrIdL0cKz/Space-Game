@@ -3,7 +3,15 @@ extends Node2D
 
 func _ready():
 	ManagerGame.elevator_floor_selected.connect(on_elevator_floor_selected)
-	
+
+
+func _unhandled_input(event):
+	if event is InputEventScreenTouch and !event.pressed:
+		var pos = Vector2.ZERO
+		pos.x = event.position.x
+		pos.y = $Player.global_position.y
+		
+		$Player.move_to(pos)
 
 
 func on_elevator_floor_selected(floor_number):
