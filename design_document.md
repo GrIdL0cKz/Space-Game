@@ -96,3 +96,14 @@ Realistic estimate: 10–15% of the game's scope is built. The 85% remaining con
 1. Ship **The Shape of Quiet**
 2. Ship **Keeping Up** (currently blocked on artwork)
 3. Pick up **Space Game**, starting with the EVA vertical slice
+
+
+## Bones build — 2026-07-12 overnight
+
+The skeleton now exists (commits `80e6176` → `07e4ba5`). Story refinement from Rob's brief: the automation stops SHORT of the destination (not "wake on descent"); ~512 embryos; crew dead, not horror; the wormhole punchline unchanged.
+
+**Playable now:** interaction system (E + click-to-walk-and-use, floating prompts), backpack with examine/wear/read/use, unlimited labelled saves + silent checkpoints before lethal choices, Space Quest death cards, the reader (manuals/logs/briefs carry both tutorials and story), the ship-computer companion's first lines, five rooms off Rob's hull (science lab behind a keycard, viewing deck with the destination in the window, cockpit, fighter bay, aft airlock), the crawlspace via hatches, five minigames (attic wiring → lab power, sample scanner, course plotting, the airlock sequence — wrong order kills, the manual teaches it — and the two-of-three breaker board), the full airlock/EVA loop (suit rules enforced, salvage outside, total silence in vacuum, TSHHHH on re-entry), and `scenes/eva/tether_test.tscn` — the signature tether prototype: elastic line, reel, grab, throw-for-reaction.
+
+**The audio rule is law:** no music anywhere; every sound synthesised placeholder is diegetic and replaceable file-for-file in `assets/sfx/`.
+
+**Not built, by design:** the dogfight (the fighter has a seat and an excuse), the lander/planet phase (a door that doesn't open), story completion, real foley, Dialogic removal (installed but dormant; the custom reader + computer lines replaced it).
