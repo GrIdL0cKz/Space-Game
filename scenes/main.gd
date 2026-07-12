@@ -10,7 +10,7 @@ func _ready() -> void:
 
 func _on_play_pressed() -> void:
 	GameState.reset()
-	get_tree().change_scene_to_file("res://scenes/craft_world.tscn")
+	get_tree().change_scene_to_file("res://scenes/intro.tscn")
 
 func _on_load_pressed() -> void:
 	Hud.open_load_panel()

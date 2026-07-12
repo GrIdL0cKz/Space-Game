@@ -1,29 +1,28 @@
 extends RoomBase
-## The aft airlock. Everything Rob promised about Space Quest lives here:
-## the chamber follows real procedure, the manual teaches it, and every
-## shortcut is survivable only by reload. Checkpoints are written before
-## each lethal choice, so dying is a punchline, not a punishment.
+## The aft airlock, at hull scale: suit rack, manual pouch, pressure
+## console between two real doors. Every lethal choice checkpoints first.
 
 func _init() -> void:
 	bg_texture = "res://astronaught/environs/rooms/airlock.png"
-	default_spawn = Vector2(160, 860)
+	default_spawn = Vector2(300, STAND_Y)
 
 func _populate() -> void:
-	add_spot(Doorway.make("Inner door - back inside", "res://scenes/craft_world.tscn",
-			Vector2(1830, 655)), Vector2(180, 800))
+	add_door("Ship", 148, "res://scenes/craft_world.tscn", Vector2(1830, 655))
+	add_sign("Airlock", 960)
 	add_spot(Searchable.make("Suit rack", "searched_suit_rack",
 			["suit_torso", "suit_helmet"],
 			"A pressure suit and helmet, racked with the care of someone who meant to come back."),
-			Vector2(560, 800))
+			530, Vector2(260, 170))
 	add_spot(Searchable.make("Document pouch", "searched_airlock_pouch",
 			["manual_airlock"],
 			"A laminated manual on a lanyard. Rev. 11. You wonder briefly about Revs 1 through 10.",
 			"Just the pouch. The lanyard stays."),
-			Vector2(870, 700))
+			745)
 	var console := PressureConsole.new()
-	add_spot(console, Vector2(1030, 760), Vector2(300, 260))
+	add_spot(console, 960, Vector2(300, 190))
 	var outer := OuterDoor.new()
-	add_spot(outer, Vector2(1650, 800), Vector2(320, 400))
+	add_sign("Outer Door", 1768)
+	add_spot(outer, 1768, Vector2(220, 220))
 
 class PressureConsole extends Interactable:
 	func _init() -> void:
@@ -33,7 +32,6 @@ class PressureConsole extends Interactable:
 		if bool(GameState.get_flag("airlock_cycled")):
 			Hud.toast("Chamber at vacuum. The outer door is willing.")
 			return
-		# The choice ahead can kill: bank progress silently first.
 		SaveManager.write_checkpoint()
 		Minigames.open_airlock_sequence()
 
@@ -53,5 +51,5 @@ class OuterDoor extends Interactable:
 			return
 		GameState.set_flag("went_eva")
 		Sd.play(&"airlock_clunk")
-		SaveManager._pending_pos = [180.0, 540.0]
+		SaveManager._pending_pos = [220.0, 631.0]
 		get_tree().change_scene_to_file.call_deferred("res://scenes/rooms/eva_outside.tscn")

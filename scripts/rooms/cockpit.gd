@@ -1,24 +1,23 @@
 extends RoomBase
-## The main shuttle cockpit. Course plotting happens here, and the ship
-## computer wakes up here for the first time - your only colleague.
+## The main shuttle cockpit, in the nose taper. Course plotting and the
+## computer's first words happen at the dash.
 
 func _init() -> void:
 	bg_texture = "res://astronaught/environs/rooms/cockpit.png"
-	default_spawn = Vector2(1760, 860)
+	default_spawn = Vector2(1700, STAND_Y)
 
 func _populate() -> void:
-	add_spot(Doorway.make("Back to the ship", "res://scenes/craft_world.tscn",
-			Vector2(260, 331)), Vector2(1840, 800))
+	add_door("Corridor", 1828, "res://scenes/craft_world.tscn", Vector2(260, 331))
+	add_sign("Cockpit", 620)
 	var nav := NavConsole.new()
-	add_spot(nav, Vector2(1000, 780), Vector2(360, 240))
+	add_spot(nav, 615, Vector2(560, 170))
 	add_spot(FlavourSpot.make("Pilot's seat", [
 		"You sit in it. You feel neither more nor less qualified.",
-		"There is a coffee holder. There is no coffee. Priorities were had.",
-	]), Vector2(1080, 500))
-	var overhead := FlavourSpot.make("Overhead panel", [
+		"There is a cup holder. There is no cup. Priorities were had.",
+	]), 1020)
+	add_spot(FlavourSpot.make("Advisory panel", [
 		"Half the lights are amber. The manual calls amber 'advisory'. The manual is an optimist.",
-	])
-	add_spot(overhead, Vector2(1300, 200), Vector2(700, 200))
+	]), 1445, Vector2(560, 200))
 
 class NavConsole extends Interactable:
 	func _init() -> void:

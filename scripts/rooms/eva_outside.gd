@@ -1,20 +1,21 @@
 extends Node2D
-## Outside, aft of the ship. No gravity, no sound - the mute is total and
-## deliberate. Drift with gentle thrusts (heard only as suit-conducted
-## puffs... no. Heard as nothing. THE RULE.), gather what the asteroid
-## field left embedded in the neighbourhood, and come home to the loudest
-## TSHHHH in the game.
+## EVA, aft of the Perennial: a 4,200px side-scrolling drift through the
+## debris the impact left behind. The stern towers at the left, the field
+## scatters right, the camera follows, and there is NO sound - the mute is
+## total until the airlock takes you back.
 
-const DRIFT_THRUST := 220.0
-const MAX_SPEED := 420.0
+const WORLD_W := 4200.0
+const DRIFT_THRUST := 240.0
+const MAX_SPEED := 460.0
 
 var player: CharacterBody2D
-var salvage_taken: int = 0
+var camera: Camera2D
 
 func _ready() -> void:
 	add_to_group("world")
 	Sd.set_eva_silence(true)
 	_build_backdrop()
+	_build_stern()
 	_build_player()
 	_build_salvage()
 	_build_airlock_return()
@@ -24,49 +25,73 @@ func _exit_tree() -> void:
 
 func _build_backdrop() -> void:
 	var bg := ColorRect.new()
-	bg.color = Color(0.03, 0.024, 0.047)
-	bg.size = Vector2(1920, 1080)
+	bg.color = Color(0.024, 0.018, 0.04)
+	bg.size = Vector2(WORLD_W, 1080)
 	bg.z_index = -20
 	add_child(bg)
 	var rnd := RandomNumberGenerator.new()
 	rnd.seed = 42
-	for i in 130:
+	for i in 420:
 		var star := ColorRect.new()
-		star.color = Color(0.9, 0.93, 0.96, rnd.randf_range(0.4, 1.0))
+		var deep := rnd.randf() < 0.5
+		star.color = Color(0.9, 0.93, 0.96, rnd.randf_range(0.25, 1.0) * (0.5 if deep else 1.0))
 		star.size = Vector2.ONE * (2 if rnd.randf() < 0.85 else 3)
-		star.position = Vector2(rnd.randf_range(0, 1920), rnd.randf_range(0, 1080))
+		star.position = Vector2(rnd.randf_range(0, WORLD_W), rnd.randf_range(0, 1080))
 		star.z_index = -19
 		add_child(star)
-	# The stern of the Perennial along the left edge: hull plates, a slice
-	# of the ship you have spent all game inside, seen from the cold side.
+
+func _build_stern() -> void:
+	# The back of the ship: hull slab, engine bells, the blue stripe - the
+	# same ship you know, from the side nobody visits.
 	var hull := ColorRect.new()
-	hull.color = Color(0.72, 0.78, 0.82)
-	hull.size = Vector2(150, 1080)
+	hull.color = Color(0.95, 0.96, 0.97)
+	hull.size = Vector2(220, 760)
+	hull.position = Vector2(0, 160)
 	hull.z_index = -10
 	add_child(hull)
-	var hull_edge := ColorRect.new()
-	hull_edge.color = Color(0, 0, 0)
-	hull_edge.position = Vector2(150, 0)
-	hull_edge.size = Vector2(6, 1080)
-	hull_edge.z_index = -9
-	add_child(hull_edge)
-	for y in range(60, 1080, 170):
+	var stripe := ColorRect.new()
+	stripe.color = Color(0.41, 0.76, 0.92)
+	stripe.size = Vector2(220, 26)
+	stripe.position = Vector2(0, 200)
+	stripe.z_index = -9
+	add_child(stripe)
+	var edge := ColorRect.new()
+	edge.color = Color(0, 0, 0)
+	edge.position = Vector2(220, 160)
+	edge.size = Vector2(6, 760)
+	edge.z_index = -9
+	add_child(edge)
+	for by in [330.0, 560.0, 790.0]:
+		var bell := Polygon2D.new()
+		bell.polygon = PackedVector2Array([
+			Vector2(226, by), Vector2(320, by - 46), Vector2(320, by + 46)])
+		bell.color = Color(0.32, 0.36, 0.42)
+		bell.z_index = -9
+		add_child(bell)
+	var plate_seams := [260.0, 480.0, 700.0]
+	for sy in plate_seams:
 		var seam := ColorRect.new()
-		seam.color = Color(0.5, 0.56, 0.6)
-		seam.position = Vector2(0, y)
-		seam.size = Vector2(150, 4)
+		seam.color = Color(0.62, 0.68, 0.72)
+		seam.position = Vector2(0, sy)
+		seam.size = Vector2(220, 5)
 		seam.z_index = -9
 		add_child(seam)
 
 func _build_player() -> void:
 	player = preload("res://actors/entities/player.tscn").instantiate()
 	var pending: Variant = SaveManager.consume_pending_position()
-	player.global_position = pending if pending is Vector2 else Vector2(220, 540)
+	player.global_position = pending if pending is Vector2 else Vector2(340, 540)
 	add_child(player)
-	# Weightless: no gravity, no floor. The player script's physics loop is
-	# superseded by drift.
 	player.set_physics_process(false)
-	player.controls_locked = false
+	camera = Camera2D.new()
+	camera.zoom = Vector2.ONE * 1.4
+	camera.position_smoothing_enabled = true
+	camera.limit_left = 0
+	camera.limit_right = int(WORLD_W)
+	camera.limit_top = 0
+	camera.limit_bottom = 1080
+	player.add_child(camera)
+	camera.make_current()
 
 func _physics_process(delta: float) -> void:
 	if player == null or Hud.any_overlay_open():
@@ -80,18 +105,20 @@ func _physics_process(delta: float) -> void:
 	if input != Vector2.ZERO:
 		player.velocity += input.normalized() * DRIFT_THRUST * delta
 	player.velocity = player.velocity.limit_length(MAX_SPEED)
-	# Nothing out here slows you down. Newton is the level designer now.
 	player.move_and_slide()
-	player.global_position.y = clampf(player.global_position.y, 40, 1040)
-	player.global_position.x = clampf(player.global_position.x, 170, 1880)
+	player.global_position.y = clampf(player.global_position.y, 60, 1020)
+	player.global_position.x = clampf(player.global_position.x, 250, WORLD_W - 60)
 	player._update_prompt()
 
 func _build_salvage() -> void:
 	var spots := [
-		[Vector2(700, 300), "scrap_metal", "A shard of your own hull. You take it personally, and then just take it."],
-		[Vector2(1200, 620), "sample_rock", "A fragment of whatever hit the ship. The lab will want a word with it."],
-		[Vector2(1500, 240), "fuse", "A supply crate, split open years ago. One fuse survived the escape attempt."],
-		[Vector2(950, 850), "scrap_metal", "Hull plating, drifting in slow formation with its old address."],
+		[Vector2(760, 320), "scrap_metal", "A shard of your own hull. You take it personally, and then just take it."],
+		[Vector2(1240, 700), "fuse", "A supply crate, split open years ago. One fuse survived the escape attempt."],
+		[Vector2(1750, 260), "scrap_metal", "Hull plating, drifting in slow formation with its old address."],
+		[Vector2(2260, 620), "sample_rock", "A fragment of whatever hit the ship. The lab will want a word with it."],
+		[Vector2(2840, 380), "wire_coil", "A whole coil of insulated wire, orbiting nothing in particular. Finders keepers."],
+		[Vector2(3380, 760), "power_cell", "An emergency cell, ejected with a panel during the strike. Still warm with charge."],
+		[Vector2(3900, 480), "scrap_metal", "The furthest piece. From here the ship is small enough to forgive."],
 	]
 	for s in spots:
 		var pickup := SalvagePickup.new()
@@ -100,16 +127,21 @@ func _build_salvage() -> void:
 		pickup.prompt = "Salvage"
 		var cs := CollisionShape2D.new()
 		var rect := RectangleShape2D.new()
-		rect.size = Vector2(160, 160)
+		rect.size = Vector2(170, 170)
 		cs.shape = rect
 		pickup.add_child(cs)
 		pickup.position = s[0]
 		var visual := ColorRect.new()
 		visual.color = Color(0.62, 0.66, 0.7)
-		visual.size = Vector2(34, 26)
-		visual.position = Vector2(-17, -13)
+		visual.size = Vector2(36, 28)
+		visual.position = Vector2(-18, -14)
 		visual.rotation = randf_range(-0.6, 0.6)
 		pickup.add_child(visual)
+		var glint := ColorRect.new()
+		glint.color = Color(0.9, 0.94, 1.0, 0.8)
+		glint.size = Vector2(6, 6)
+		glint.position = Vector2(-3, -22)
+		pickup.add_child(glint)
 		add_child(pickup)
 
 func _build_airlock_return() -> void:
@@ -117,10 +149,10 @@ func _build_airlock_return() -> void:
 	door.prompt = "Airlock - go inside"
 	var cs := CollisionShape2D.new()
 	var rect := RectangleShape2D.new()
-	rect.size = Vector2(220, 400)
+	rect.size = Vector2(220, 420)
 	cs.shape = rect
 	door.add_child(cs)
-	door.position = Vector2(150, 540)
+	door.position = Vector2(230, 540)
 	add_child(door)
 
 class SalvagePickup extends Interactable:
@@ -128,8 +160,6 @@ class SalvagePickup extends Interactable:
 	var line: String = ""
 
 	func _interact(_player: Node) -> void:
-		# add_item quietly: its toast is silent anyway out here, but the
-		# TEXT still matters - vacuum doesn't mute reading.
 		GameState.add_item(item_id, 1, true)
 		Hud.toast(line)
 		queue_free()
@@ -137,9 +167,8 @@ class SalvagePickup extends Interactable:
 class ReturnDoor extends Interactable:
 	func _interact(_player: Node) -> void:
 		GameState.set_flag("airlock_cycled", false)
-		SaveManager._pending_pos = [1650.0, 860.0]
+		SaveManager._pending_pos = [1650.0, 631.0]
 		get_tree().change_scene_to_file.call_deferred("res://scenes/rooms/airlock_room.tscn")
-		# The loudest sound in the game, precisely because of what preceded it.
 		Sd.set_eva_silence(false)
 		Sd.play(&"airlock_hiss")
 		Sd.play(&"airlock_clunk", -4.0)

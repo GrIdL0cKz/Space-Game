@@ -19,11 +19,70 @@ var pending_interact: Interactable = null
 var in_range: Array[Interactable] = []
 var prompt_label: Label = null
 var controls_locked: bool = false
+var crawling: bool = false
+
+const CRAWL_SPEED_MULT := 0.4
 
 func _ready() -> void:
 	add_to_group("player")
 	collision_layer = 2
 	_make_prompt_label()
+	GameState.suit_changed.connect(_refresh_helmet_frames)
+	_refresh_helmet_frames()
+
+## Crawlspace mode: the sprite lies prone, the collider flattens, jumping
+## stops, and everything slows to elbows-and-knees pace.
+func set_crawling(on: bool) -> void:
+	if crawling == on:
+		return
+	crawling = on
+	var cs: CollisionShape2D = get_node("CollisionShape2D")
+	var rect: RectangleShape2D = cs.shape
+	if on:
+		rect.size = Vector2(110, 56)
+		cs.position = Vector2(0, -24)
+		sprite.rotation = PI / 2.0 if sprite.flip_h else -PI / 2.0
+		sprite.position = Vector2(0, -26)
+	else:
+		rect.size = Vector2(62, 120)
+		cs.position = Vector2(0, -55)
+		sprite.rotation = 0.0
+		sprite.position = Vector2(0, -53)
+
+## Rob's art has helmet-off walk frames; the wardrobe and the suit system
+## use them. Idle borrows the first no-helm walk frame (no idle set exists).
+var _helm_frames_cached := {}
+
+func _refresh_helmet_frames() -> void:
+	if sprite == null:
+		return
+	var helm_on := GameState.is_equipped("suit_helmet") or not GameState.has_item("suit_helmet")
+	# Default frames in the scene ARE the helmet-on set; only override when
+	# the helmet is demonstrably off.
+	if helm_on:
+		if _helm_frames_cached.has("on"):
+			sprite.sprite_frames = _helm_frames_cached["on"]
+	else:
+		if not _helm_frames_cached.has("on"):
+			_helm_frames_cached["on"] = sprite.sprite_frames
+		if not _helm_frames_cached.has("off"):
+			var off: SpriteFrames = (sprite.sprite_frames as SpriteFrames).duplicate(true)
+			var walks: Array = []
+			for i in range(1, 5):
+				var path := "res://astronaught/Player/astro walk right no helm %d.png" % i
+				if ResourceLoader.exists(path):
+					walks.append(load(path))
+			if walks.size() == 4:
+				for anim in ["Run", "Idle"]:
+					if off.has_animation(anim):
+						off.clear(anim)
+						if anim == "Run":
+							for t in walks:
+								off.add_frame(anim, t)
+						else:
+							off.add_frame(anim, walks[0])
+			_helm_frames_cached["off"] = off
+		sprite.sprite_frames = _helm_frames_cached["off"]
 
 func _physics_process(delta: float) -> void:
 	if not is_on_floor():
@@ -50,15 +109,18 @@ func _unhandled_input(event: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 
 func _handle_keyboard_movement() -> void:
-	if Input.is_action_just_pressed("jump") and is_on_floor():
+	if Input.is_action_just_pressed("jump") and is_on_floor() and not crawling:
 		velocity.y = JUMP_VELOCITY
 		anim.play("Jump")
 	var direction := Input.get_axis("move_left", "move_right")
+	var speed := SPEED * (CRAWL_SPEED_MULT if crawling else 1.0)
 	if direction:
 		# Manual steering always overrides a queued walk order.
 		pending_interact = null
 		sprite.flip_h = direction < 0
-		velocity.x = direction * SPEED
+		if crawling:
+			sprite.rotation = PI / 2.0 if sprite.flip_h else -PI / 2.0
+		velocity.x = direction * speed
 		if velocity.y == 0:
 			anim.play("Run")
 	else:

@@ -1,10 +1,18 @@
-"""Room backdrops for Space Game, in the hull's own language: pale blue
-panelled walls, grey riveted floors, black linework, space where the
-windows are. Drawn with care - these ride until (unless) hand art replaces
-them. 1920x1080 each, matching astronaught/environs/craft interior.png.
+"""Room backdrops v2 - drawn at the HULL'S OWN SCALE this time.
+
+Rob's tube section is the bible: 92px deck interiors, 55px riveted floor
+bands, white outer skin with the light-blue stripe, black space beyond.
+Every room is another slice of the same ship, so the 120px astronaut fills
+each deck exactly as he fills Rob's corridor. Fighter bay gets a double-
+height interior because hangars earn it.
+
+Geometry (single-deck rooms):   sky | stripe 488-496 | skin 496-528 |
+interior 528-620 | floor 620-675 | skin 675-707 | stripe 707-715 | sky
+Player feet land at y=636 (16px into the floor band, per the hull).
 
 Run from anywhere:  python tools/gen_rooms.py
 """
+import math
 import os
 import random
 from PIL import Image, ImageDraw
@@ -13,15 +21,17 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "astronaught", "environs", "rooms")
 
 WALL = (204, 225, 236)
-WALL_SHADE = (184, 205, 218)
+WALL_SHADE = (188, 210, 223)
 FLOOR = (207, 207, 207)
-FLOOR_SHADE = (176, 176, 176)
+FLOOR_TICK = (150, 150, 150)
 LINE = (0, 0, 0)
-SPACE = (8, 6, 12)
-STAR = (235, 240, 245)
+SKIN = (255, 255, 255)
+STRIPE = (105, 195, 235)
+SPACE = (11, 1, 1)
+STAR = (230, 235, 240)
 METAL = (150, 158, 166)
 DARKMETAL = (96, 102, 110)
-SCREEN_BG = (16, 28, 38)
+SCREEN_BG = (14, 24, 33)
 SCREEN_INK = (110, 200, 230)
 AMBER = (240, 180, 70)
 RED = (200, 60, 50)
@@ -29,78 +39,70 @@ GREEN = (90, 180, 90)
 HAZARD = (230, 190, 60)
 
 W, H = 1920, 1080
-FLOOR_Y = 900
 
-random.seed(11)
-
-
-def base(draw, wall=WALL):
-    draw.rectangle([0, 0, W, H], fill=wall)
-    # vertical wall panel lines, hull cadence
-    for x in range(0, W + 1, 240):
-        draw.line([x, 0, x, FLOOR_Y], fill=LINE, width=3)
-    # ceiling strip
-    draw.rectangle([0, 0, W, 40], fill=FLOOR)
-    draw.line([0, 40, W, 40], fill=LINE, width=4)
-    # floor: riveted grey band
-    draw.rectangle([0, FLOOR_Y, W, H], fill=FLOOR)
-    draw.line([0, FLOOR_Y, W, FLOOR_Y], fill=LINE, width=5)
-    draw.rectangle([0, FLOOR_Y + 60, W, H], fill=FLOOR_SHADE)
-    for x in range(30, W, 90):
-        draw.line([x, FLOOR_Y + 12, x + 18, FLOOR_Y + 12], fill=DARKMETAL, width=4)
+INT_TOP = 528
+FLOOR_TOP = 620
+FLOOR_BOT = 675
 
 
-def outline_rect(draw, box, fill, width=4):
-    draw.rectangle(box, fill=fill, outline=LINE, width=width)
+def tube(draw, int_top=INT_TOP, wall=WALL, rnd_seed=1):
+    """Space, then a slice of ship. int_top lets the fighter bay go taller."""
+    draw.rectangle([0, 0, W, H], fill=SPACE)
+    rnd = random.Random(rnd_seed)
+    for i in range(120):
+        x, y = rnd.randint(0, W - 1), rnd.randint(0, H - 1)
+        draw.point((x, y), fill=STAR)
+        if rnd.random() < 0.2:
+            draw.point((x + 1, y), fill=(140, 150, 160))
+    skin_top = int_top - 32
+    draw.rectangle([0, skin_top - 8, W, skin_top], fill=STRIPE)
+    draw.rectangle([0, skin_top, W, int_top], fill=SKIN)
+    draw.line([0, int_top, W, int_top], fill=LINE, width=4)
+    draw.rectangle([0, int_top, W, FLOOR_TOP], fill=wall)
+    # wall panel seams, hull cadence (~190px)
+    for x in range(0, W + 1, 190):
+        draw.line([x, int_top, x, FLOOR_TOP], fill=LINE, width=3)
+    # floor band with rivet ticks
+    draw.line([0, FLOOR_TOP, W, FLOOR_TOP], fill=LINE, width=4)
+    draw.rectangle([0, FLOOR_TOP, W, FLOOR_BOT], fill=FLOOR)
+    for x in range(24, W, 56):
+        draw.line([x, FLOOR_TOP + 10, x + 14, FLOOR_TOP + 10], fill=FLOOR_TICK, width=3)
+        draw.line([x + 8, FLOOR_TOP + 34, x + 22, FLOOR_TOP + 34], fill=FLOOR_TICK, width=3)
+    draw.line([0, FLOOR_BOT, W, FLOOR_BOT], fill=LINE, width=4)
+    draw.rectangle([0, FLOOR_BOT, W, FLOOR_BOT + 32], fill=SKIN)
+    draw.rectangle([0, FLOOR_BOT + 32, W, FLOOR_BOT + 40], fill=STRIPE)
 
 
-def screen(draw, box, kind="wave"):
-    outline_rect(draw, box, SCREEN_BG)
+def outline_rect(d, box, fill, width=3):
+    d.rectangle(box, fill=fill, outline=LINE, width=width)
+
+
+def screen(d, box, kind="wave", seed=2):
+    outline_rect(d, box, SCREEN_BG)
     x0, y0, x1, y1 = box
+    rnd = random.Random(seed)
     if kind == "wave":
         pts = []
-        for i in range(0, x1 - x0 - 20, 8):
-            import math
-            pts.append((x0 + 10 + i, (y0 + y1) / 2 + math.sin(i * 0.07) * (y1 - y0) * 0.25))
-        draw.line(pts, fill=SCREEN_INK, width=3)
+        for i in range(0, x1 - x0 - 12, 5):
+            pts.append((x0 + 6 + i, (y0 + y1) / 2 + math.sin(i * 0.11) * (y1 - y0) * 0.25))
+        d.line(pts, fill=SCREEN_INK, width=2)
     elif kind == "bars":
-        for i, hgt in enumerate([0.3, 0.55, 0.42, 0.7, 0.5, 0.62]):
-            bx = x0 + 14 + i * ((x1 - x0 - 28) // 6)
-            draw.rectangle([bx, y1 - 12 - (y1 - y0 - 24) * hgt, bx + 18, y1 - 12], fill=SCREEN_INK)
+        n = max(3, (x1 - x0) // 18)
+        for i in range(n):
+            bx = x0 + 6 + i * ((x1 - x0 - 12) // n)
+            hgt = rnd.uniform(0.25, 0.8)
+            d.rectangle([bx, y1 - 6 - (y1 - y0 - 14) * hgt, bx + 8, y1 - 6], fill=SCREEN_INK)
     elif kind == "text":
-        for i in range(4):
-            ly = y0 + 14 + i * 18
-            draw.line([x0 + 12, ly, x1 - random.randint(12, 80), ly], fill=SCREEN_INK, width=4)
-    elif kind == "stars":
-        for i in range(30):
-            sx = random.randint(x0 + 8, x1 - 8)
-            sy = random.randint(y0 + 8, y1 - 8)
-            draw.point((sx, sy), fill=STAR)
+        for i in range((y1 - y0 - 10) // 10):
+            ly = y0 + 8 + i * 10
+            d.line([x0 + 6, ly, x1 - rnd.randint(8, 40), ly], fill=SCREEN_INK, width=2)
 
 
-def window_space(draw, box, planet=False):
-    x0, y0, x1, y1 = box
-    draw.rectangle([x0 - 14, y0 - 14, x1 + 14, y1 + 14], fill=METAL, outline=LINE, width=4)
-    draw.rectangle(box, fill=SPACE, outline=LINE, width=4)
-    rnd = random.Random(5)
-    for i in range(90):
-        sx = rnd.randint(x0 + 6, x1 - 6)
-        sy = rnd.randint(y0 + 6, y1 - 6)
-        draw.point((sx, sy), fill=STAR)
-        if rnd.random() < 0.15:
-            draw.point((sx + 1, sy), fill=(150, 160, 175))
-    if planet:
-        # the destination, quietly enormous
-        cx, cy, r = x1 - 200, y0 + 190, 150
-        draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=(96, 128, 118), outline=LINE, width=4)
-        draw.ellipse([cx - r + 30, cy - r + 25, cx + r - 60, cy - 20], fill=(120, 152, 138))
-        draw.arc([cx - r - 40, cy - 44, cx + r + 40, cy + 44], 200, 340, fill=(180, 190, 200), width=6)
-
-
-def hazard_strip(draw, y, x0=0, x1=W):
-    for x in range(x0, x1, 48):
-        draw.polygon([(x, y), (x + 24, y), (x + 48, y + 22), (x + 24, y + 22)], fill=HAZARD)
-    draw.rectangle([x0, y, x1, y + 22], outline=LINE, width=3)
+def door_recess(d, x, label_strip=True):
+    """A doorway recess in the wall; the interactive door sprite sits here."""
+    outline_rect(d, [x, INT_TOP + 4, x + 96, FLOOR_TOP], WALL_SHADE, 3)
+    if label_strip:
+        outline_rect(d, [x + 8, INT_TOP - 26, x + 88, INT_TOP - 2], DARKMETAL, 2)
 
 
 def save(img, name):
@@ -112,113 +114,153 @@ def save(img, name):
 # ------------------------------------------------------------- science lab
 img = Image.new("RGB", (W, H))
 d = ImageDraw.Draw(img)
-base(d)
-# workbench with scanner
-outline_rect(d, [200, 700, 900, FLOOR_Y], METAL)
-outline_rect(d, [240, 740, 860, 780], DARKMETAL)  # drawer line
-outline_rect(d, [380, 560, 660, 700], (222, 232, 238))  # scanner housing
-d.ellipse([430, 580, 610, 680], fill=SCREEN_BG, outline=LINE, width=4)  # dome
-d.line([520, 580, 520, 540], fill=LINE, width=4)
-d.ellipse([505, 515, 535, 545], fill=AMBER, outline=LINE, width=3)  # scan lamp
-# wall screens
-screen(d, [1050, 220, 1500, 420], "wave")
-screen(d, [1560, 240, 1840, 400], "bars")
-# shelf with jars
-outline_rect(d, [1050, 560, 1840, 580], METAL)
-for i, jx in enumerate(range(1090, 1800, 110)):
+tube(d, rnd_seed=3)
+door_recess(d, 60)
+# workbench with scanner dome (player-height bench)
+outline_rect(d, [420, FLOOR_TOP - 52, 760, FLOOR_TOP], METAL)
+d.ellipse([540, FLOOR_TOP - 108, 650, FLOOR_TOP - 48], fill=SCREEN_BG, outline=LINE, width=3)
+d.ellipse([583, FLOOR_TOP - 122, 607, FLOOR_TOP - 98], fill=AMBER, outline=LINE, width=2)
+# wall screens in the band
+screen(d, [840, INT_TOP + 14, 1080, INT_TOP + 66], "wave")
+screen(d, [1110, INT_TOP + 14, 1250, INT_TOP + 66], "bars")
+# shelf of jars
+d.line([1320, INT_TOP + 40, 1660, INT_TOP + 40], fill=LINE, width=4)
+for i, jx in enumerate(range(1340, 1640, 60)):
     jc = [(140, 190, 170), (170, 150, 190), (190, 180, 140)][i % 3]
-    outline_rect(d, [jx, 490, jx + 60, 560], jc, 3)
-    d.rectangle([jx, 478, jx + 60, 492], fill=DARKMETAL, outline=LINE, width=3)
-# specimen table
-outline_rect(d, [1150, 760, 1500, FLOOR_Y], (222, 232, 238))
+    outline_rect(d, [jx, INT_TOP + 6, jx + 34, INT_TOP + 38], jc, 2)
+# specimen locker right
+outline_rect(d, [1700, FLOOR_TOP - 78, 1850, FLOOR_TOP], DARKMETAL)
+d.line([1775, FLOOR_TOP - 78, 1775, FLOOR_TOP], fill=LINE, width=3)
 save(img, "science_lab")
 
 # ------------------------------------------------------------ viewing deck
 img = Image.new("RGB", (W, H))
 d = ImageDraw.Draw(img)
-base(d)
-window_space(d, [260, 160, 1660, 640], planet=True)
+tube(d, rnd_seed=4)
+door_recess(d, 60)
+# the wall band becomes glass: space and the destination seen from inside
+d.rectangle([260, INT_TOP + 4, 1860, FLOOR_TOP - 2], fill=SPACE)
+rnd = random.Random(7)
+for i in range(60):
+    d.point((rnd.randint(270, 1850), rnd.randint(INT_TOP + 8, FLOOR_TOP - 8)), fill=STAR)
+cx, cy, r = 1560, INT_TOP + 46, 34
+d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=(96, 128, 118), outline=LINE, width=3)
+d.arc([cx - r - 12, cy - 12, cx + r + 12, cy + 12], 200, 340, fill=(180, 190, 200), width=3)
+for mx in range(260, 1861, 200):  # mullions
+    d.line([mx, INT_TOP + 4, mx, FLOOR_TOP - 2], fill=LINE, width=5)
+d.rectangle([260, INT_TOP, 1860, INT_TOP + 4], fill=METAL)
 # handrail
-d.line([200, 760, 1720, 760], fill=LINE, width=6)
-d.rectangle([200, 760, 1720, 772], fill=METAL, outline=LINE, width=3)
-for px in range(260, 1700, 240):
-    outline_rect(d, [px, 772, px + 16, FLOOR_Y], METAL, 3)
-# bench
-outline_rect(d, [760, 800, 1160, 840], (222, 232, 238))
-outline_rect(d, [790, 840, 820, FLOOR_Y], DARKMETAL, 3)
-outline_rect(d, [1100, 840, 1130, FLOOR_Y], DARKMETAL, 3)
+d.line([300, FLOOR_TOP - 34, 1820, FLOOR_TOP - 34], fill=LINE, width=5)
+for px in range(340, 1800, 190):
+    d.line([px, FLOOR_TOP - 34, px, FLOOR_TOP], fill=LINE, width=4)
 save(img, "viewing_deck")
 
 # ---------------------------------------------------------------- cockpit
 img = Image.new("RGB", (W, H))
 d = ImageDraw.Draw(img)
-base(d)
-# canopy: angled window filling the left
-d.polygon([(0, 80), (760, 160), (760, 620), (0, 760)], fill=SPACE, outline=LINE)
-rnd = random.Random(9)
-for i in range(60):
-    sx = rnd.randint(30, 720)
-    sy = rnd.randint(140, 660)
-    d.point((sx, sy), fill=STAR)
-# console bank
-outline_rect(d, [760, 560, 1860, FLOOR_Y], METAL)
-screen(d, [800, 600, 1140, 780], "text")
-screen(d, [1180, 600, 1520, 780], "wave")
-screen(d, [1560, 600, 1820, 780], "bars")
-for i, bx in enumerate(range(820, 1800, 70)):
-    col = [GREEN, AMBER, RED][i % 3]
-    d.ellipse([bx, 820, bx + 22, 842], fill=col, outline=LINE, width=3)
+tube(d, rnd_seed=5)
+# nose taper at the left: canopy glass
+d.polygon([(0, INT_TOP - 32), (330, INT_TOP - 32), (60, FLOOR_TOP), (0, FLOOR_TOP)],
+          fill=SPACE, outline=LINE)
+rnd = random.Random(11)
+for i in range(24):
+    px = rnd.randint(8, 280)
+    py = rnd.randint(INT_TOP - 20, FLOOR_TOP - 30)
+    if px < 330 - (py - (INT_TOP - 32)) * (270.0 / (FLOOR_TOP - INT_TOP + 32)):
+        d.point((px, py), fill=STAR)
+# dash console
+outline_rect(d, [330, FLOOR_TOP - 64, 900, FLOOR_TOP], METAL)
+screen(d, [350, FLOOR_TOP - 56, 540, FLOOR_TOP - 12], "text")
+screen(d, [560, FLOOR_TOP - 56, 720, FLOOR_TOP - 12], "wave")
+for i, bx in enumerate(range(740, 880, 34)):
+    d.ellipse([bx, FLOOR_TOP - 40, bx + 20, FLOOR_TOP - 20], fill=[GREEN, AMBER, RED][i % 3], outline=LINE, width=2)
 # pilot seat
-outline_rect(d, [980, 380, 1180, 560], (60, 70, 84))
-outline_rect(d, [980, 340, 1160, 390], (60, 70, 84))
-# overhead panel
-outline_rect(d, [900, 60, 1700, 150], DARKMETAL)
-for bx in range(940, 1660, 90):
-    d.ellipse([bx, 88, bx + 26, 114], fill=AMBER if (bx // 90) % 2 else GREEN, outline=LINE, width=3)
+outline_rect(d, [960, FLOOR_TOP - 84, 1080, FLOOR_TOP], (60, 70, 84))
+outline_rect(d, [960, FLOOR_TOP - 104, 1050, FLOOR_TOP - 80], (60, 70, 84))
+# overhead advisory panel
+outline_rect(d, [1150, INT_TOP + 10, 1740, INT_TOP + 54], DARKMETAL)
+for i, bx in enumerate(range(1170, 1720, 52)):
+    d.ellipse([bx, INT_TOP + 22, bx + 18, INT_TOP + 40], fill=AMBER if i % 2 else GREEN, outline=LINE, width=2)
+door_recess(d, 1780)
 save(img, "cockpit")
 
 # -------------------------------------------------------------- fighter bay
+BAY_TOP = INT_TOP - 120  # double-height hangar
 img = Image.new("RGB", (W, H))
 d = ImageDraw.Draw(img)
-base(d, WALL_SHADE)
-hazard_strip(d, FLOOR_Y - 22, 200, 1700)
-# the little fighter on its cradle
-d.polygon([(560, 700), (1160, 700), (1300, 640), (1160, 560), (700, 560), (560, 640)],
-          fill=(120, 130, 140), outline=LINE)
-d.polygon([(1300, 640), (1420, 620), (1300, 590)], fill=(120, 130, 140), outline=LINE)  # nose
-d.rectangle([820, 500, 1000, 566], fill=SCREEN_BG, outline=LINE, width=4)  # canopy
-d.polygon([(620, 560), (520, 460), (580, 450), (700, 556)], fill=DARKMETAL, outline=LINE)  # tail fin
-outline_rect(d, [640, 700, 760, 780], DARKMETAL)   # cradle legs
-outline_rect(d, [1060, 700, 1180, 780], DARKMETAL)
-# tool chest + fuel line
-outline_rect(d, [220, 760, 460, FLOOR_Y], RED)
-for dy in [790, 830, 870]:
-    d.line([240, dy, 440, dy], fill=LINE, width=3)
-d.line([1420, 620, 1700, 620, 1700, FLOOR_Y], fill=DARKMETAL, width=8)
-# bay door outline on back wall
-outline_rect(d, [1480, 120, 1860, 700], (170, 190, 205))
-d.line([1480, 410, 1860, 410], fill=LINE, width=5)
+tube(d, int_top=BAY_TOP, wall=WALL_SHADE, rnd_seed=6)
+door_recess(d, 60)
+for x in range(0, W, 48):  # hazard strip along the floor edge
+    d.polygon([(x, FLOOR_TOP - 16), (x + 24, FLOOR_TOP - 16), (x + 40, FLOOR_TOP), (x + 16, FLOOR_TOP)], fill=HAZARD)
+d.line([0, FLOOR_TOP - 16, W, FLOOR_TOP - 16], fill=LINE, width=3)
+# the P-1 interceptor, drawn like it deserves: fuselage, canopy, fin, wing
+fx, fy = 760, FLOOR_TOP  # nose gear reference
+d.polygon([(fx - 160, fy - 60), (fx + 240, fy - 60), (fx + 330, fy - 34), (fx + 240, fy - 12),
+           (fx - 120, fy - 12), (fx - 190, fy - 36)], fill=(126, 138, 148), outline=LINE)  # fuselage
+d.polygon([(fx + 330, fy - 34), (fx + 396, fy - 28), (fx + 330, fy - 22)], fill=(150, 158, 166), outline=LINE)  # nose cone
+d.polygon([(fx - 60, fy - 60), (fx - 10, fy - 96), (fx + 60, fy - 96), (fx + 90, fy - 60)],
+          fill=SCREEN_BG, outline=LINE)  # canopy
+d.polygon([(fx - 160, fy - 60), (fx - 230, fy - 128), (fx - 190, fy - 132), (fx - 96, fy - 62)],
+          fill=DARKMETAL, outline=LINE)  # tail fin
+d.polygon([(fx + 20, fy - 12), (fx + 130, fy - 12), (fx + 100, fy + 6), (fx + 40, fy + 6)],
+          fill=DARKMETAL, outline=LINE)  # wing root under
+d.ellipse([fx - 220, fy - 46, fx - 176, fy - 24], fill=(40, 46, 54), outline=LINE, width=3)  # engine
+d.line([fx - 90, fy - 12, fx - 90, fy], fill=LINE, width=4)  # gear
+d.line([fx + 180, fy - 12, fx + 180, fy], fill=LINE, width=4)
+# shark sticker
+d.polygon([(fx + 240, fy - 44), (fx + 270, fy - 38), (fx + 240, fy - 32)], fill=(230, 230, 235), outline=LINE)
+# tool chest + breaker board
+outline_rect(d, [200, FLOOR_TOP - 56, 380, FLOOR_TOP], RED)
+d.line([210, FLOOR_TOP - 38, 370, FLOOR_TOP - 38], fill=LINE, width=3)
+d.line([210, FLOOR_TOP - 20, 370, FLOOR_TOP - 20], fill=LINE, width=3)
+outline_rect(d, [1560, INT_TOP - 60, 1700, FLOOR_TOP - 40], (70, 78, 88))
+for i in range(3):
+    d.rectangle([1580 + i * 40, INT_TOP - 40, 1600 + i * 40, INT_TOP], fill=AMBER if i < 2 else DARKMETAL, outline=LINE, width=2)
+door_recess(d, 1780)
 save(img, "fighter_bay")
 
 # ---------------------------------------------------------------- airlock
 img = Image.new("RGB", (W, H))
 d = ImageDraw.Draw(img)
-base(d, WALL_SHADE)
-hazard_strip(d, FLOOR_Y - 22)
-# inner door (left) and outer door (right)
-for x0, label_led in [(120, GREEN), (1500, RED)]:
-    outline_rect(d, [x0, 200, x0 + 300, FLOOR_Y], METAL, 6)
-    d.line([x0 + 150, 200, x0 + 150, FLOOR_Y], fill=LINE, width=5)
-    d.ellipse([x0 + 120, 300, x0 + 180, 360], fill=SCREEN_BG, outline=LINE, width=4)  # porthole
-    d.ellipse([x0 + 130, 420, x0 + 170, 460], fill=label_led, outline=LINE, width=3)  # status led
-# pressure console between doors
-outline_rect(d, [760, 480, 1180, 760], (222, 232, 238))
-screen(d, [790, 510, 1150, 610], "bars")
-for i, bx in enumerate(range(800, 1140, 90)):
-    d.ellipse([bx, 650, bx + 50, 700], fill=METAL, outline=LINE, width=4)  # valve wheels
-    d.line([bx + 25, 650, bx + 25, 700], fill=LINE, width=3)
+tube(d, wall=WALL_SHADE, rnd_seed=8)
+for x in range(0, W, 48):
+    d.polygon([(x, FLOOR_TOP - 14), (x + 24, FLOOR_TOP - 14), (x + 40, FLOOR_TOP), (x + 16, FLOOR_TOP)], fill=HAZARD)
+door_recess(d, 100)   # inner door home
+door_recess(d, 1720)  # outer door home
+# pressure console
+outline_rect(d, [820, FLOOR_TOP - 78, 1100, FLOOR_TOP], (222, 232, 238))
+screen(d, [840, FLOOR_TOP - 68, 1080, FLOOR_TOP - 44], "bars")
+for bx in range(850, 1080, 60):
+    d.ellipse([bx, FLOOR_TOP - 36, bx + 30, FLOOR_TOP - 6], fill=METAL, outline=LINE, width=3)
+    d.line([bx + 15, FLOOR_TOP - 36, bx + 15, FLOOR_TOP - 6], fill=LINE, width=2)
 # suit rack
-outline_rect(d, [420, 560, 700, FLOOR_Y], DARKMETAL)
-d.line([440, 600, 680, 600], fill=METAL, width=6)
+outline_rect(d, [420, FLOOR_TOP - 84, 640, FLOOR_TOP], DARKMETAL)
+d.line([440, FLOOR_TOP - 64, 620, FLOOR_TOP - 64], fill=METAL, width=4)
+d.ellipse([470, FLOOR_TOP - 60, 500, FLOOR_TOP - 30], fill=(175, 169, 169), outline=LINE, width=2)  # helmet on rack
+# warning stencil
+outline_rect(d, [1280, INT_TOP + 16, 1560, INT_TOP + 60], (250, 240, 200), 2)
 save(img, "airlock")
-print("done")
+
+# ------------------------------------------------------------ crew quarters
+img = Image.new("RGB", (W, H))
+d = ImageDraw.Draw(img)
+tube(d, rnd_seed=9)
+door_recess(d, 60)
+# two double-stacked bunks
+for bx in [360, 760]:
+    outline_rect(d, [bx, FLOOR_TOP - 88, bx + 260, FLOOR_TOP - 52], (170, 185, 200))  # top bunk
+    outline_rect(d, [bx, FLOOR_TOP - 40, bx + 260, FLOOR_TOP - 4], (170, 185, 200))   # low bunk
+    outline_rect(d, [bx + 8, FLOOR_TOP - 84, bx + 70, FLOOR_TOP - 66], SKIN, 2)       # pillows
+    outline_rect(d, [bx + 8, FLOOR_TOP - 36, bx + 70, FLOOR_TOP - 18], SKIN, 2)
+    d.line([bx, FLOOR_TOP - 88, bx, FLOOR_TOP], fill=LINE, width=4)
+    d.line([bx + 260, FLOOR_TOP - 88, bx + 260, FLOOR_TOP], fill=LINE, width=4)
+# wardrobe: tall locker with mirror strip
+outline_rect(d, [1180, INT_TOP + 8, 1330, FLOOR_TOP], DARKMETAL)
+d.line([1255, INT_TOP + 8, 1255, FLOOR_TOP], fill=LINE, width=3)
+outline_rect(d, [1350, INT_TOP + 14, 1420, FLOOR_TOP - 6], (180, 210, 225), 3)  # mirror
+# personal wall: photos
+for i, px in enumerate(range(1500, 1720, 70)):
+    outline_rect(d, [px, INT_TOP + 20, px + 48, INT_TOP + 58], [(200, 190, 170), (170, 190, 200), (190, 170, 180)][i % 3], 2)
+save(img, "crew_quarters")
+
+print("done - all rooms at hull scale")

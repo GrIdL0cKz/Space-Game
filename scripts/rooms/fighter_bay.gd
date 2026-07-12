@@ -1,23 +1,24 @@
 extends RoomBase
-## The fighter bay. The little dogfighter sits on its cradle - one seat,
-## no systems yet, all promise. The ship's breaker board lives here too:
-## the power-routing job with real consequences.
+## The hangar: double-height, hazard-striped, one small fighter that looks
+## like somebody loved it. The breaker board rules the ship's power here.
+## Climbing in launches the first-person defence screen - once the bay has
+## power and there's a reason to fly.
 
 func _init() -> void:
 	bg_texture = "res://astronaught/environs/rooms/fighter_bay.png"
-	default_spawn = Vector2(160, 860)
+	default_spawn = Vector2(220, STAND_Y)
 
 func _populate() -> void:
-	add_spot(Doorway.make("Back to the ship", "res://scenes/craft_world.tscn",
-			Vector2(260, 655)), Vector2(80, 800))
+	add_door("Corridor", 110, "res://scenes/craft_world.tscn", Vector2(260, 655))
+	add_sign("Fighter Bay", 900, 400.0)
 	var seat := FighterSeat.new()
-	add_spot(seat, Vector2(910, 700), Vector2(500, 260))
+	add_spot(seat, 800, Vector2(560, 220))
 	add_spot(Searchable.make("Tool chest", "searched_tool_chest",
 			["power_cell", "fuse"],
 			"A power cell and a fuse, under a layer of sockets sorted by someone with feelings about sockets."),
-			Vector2(340, 830))
+			290)
 	var breaker := BreakerBoard.new()
-	add_spot(breaker, Vector2(1670, 760), Vector2(260, 300))
+	add_spot(breaker, 1630, Vector2(280, 240))
 
 class FighterSeat extends Interactable:
 	func _init() -> void:
@@ -27,9 +28,19 @@ class FighterSeat extends Interactable:
 		if not bool(GameState.get_flag("sat_in_fighter")):
 			GameState.set_flag("sat_in_fighter")
 			Hud.toast("One seat. Stick, throttle, and a sticker of a cartoon shark someone loved.")
-			Hud.computer_say("That is the P-1 interceptor. Flight systems are offline. I mention this because you have the look.")
+			Hud.computer_say("That is the P-1 interceptor. I mention its pre-flight checklist because you have the look.")
 			return
-		Hud.toast("Fuel lines dry, guidance dark. It'll fly when the ship can spare it the power. Soon.")
+		if not bool(GameState.get_flag("powered_fighter")):
+			Hud.toast("The chargers are dark. The bay circuit needs power from the breaker board.")
+			return
+		if not bool(GameState.get_flag("rock_analysed")):
+			Hud.toast("Charged and willing. Nothing on scope worth burning fuel for. Yet.")
+			Hud.computer_say("When there is something inbound worth shooting, I will be the first to tell you. Loudly.")
+			return
+		SaveManager.write_checkpoint()
+		Hud.computer_say("Debris cluster inbound on the sample fragment's trajectory. Canopy sealed. Fly well.")
+		SaveManager._pending_pos = []
+		get_tree().change_scene_to_file.call_deferred("res://scenes/fighter/dogfight.tscn")
 
 class BreakerBoard extends Interactable:
 	func _init() -> void:

@@ -1,24 +1,25 @@
 extends RoomBase
-## The science lab. Locked behind Dr. Okonkwo's keycard; home of the sample
-## scanner (needs lab power from the attic wiring job before it hums).
+## The science lab: scanner on the bench, jars on the shelf, a locker of
+## other people's careful work. Needs the keycard to enter and attic power
+## to be useful.
 
 func _init() -> void:
 	bg_texture = "res://astronaught/environs/rooms/science_lab.png"
-	default_spawn = Vector2(160, 860)
+	default_spawn = Vector2(220, STAND_Y)
 
 func _populate() -> void:
-	add_spot(Doorway.make("Back to the ship", "res://scenes/craft_world.tscn",
-			Vector2(1500, 655)), Vector2(80, 800))
+	add_door("Corridor", 110, "res://scenes/craft_world.tscn", Vector2(1500, 655))
+	add_sign("Science Lab", 590)
 	var scanner := ScannerConsole.new()
-	add_spot(scanner, Vector2(520, 760))
+	add_spot(scanner, 590, Vector2(360, 170))
 	add_spot(Searchable.make("Search the shelf", "searched_lab_shelf",
 			["fuse"],
 			"Behind the jars: a spare fuse. The jars you leave exactly where they are.",
-			"The jars watch you leave. Probably."), Vector2(1440, 700))
-	add_spot(FlavourSpot.make("Specimen table", [
-		"Someone labelled the table 'CLEAN' and the label itself is filthy.",
-		"Three hundred years of sterile procedure, undone by one coffee ring.",
-	]), Vector2(1320, 820))
+			"The jars watch you leave. Probably."), 1480, Vector2(340, 170))
+	add_spot(Searchable.make("Specimen locker", "searched_lab_locker",
+			["sample_rock"],
+			"A catalogued fragment, bagged and dated Y204. Dr. Okonkwo never got to finish with it.",
+			"Empty, except for the smell of careful work."), 1775)
 
 class ScannerConsole extends Interactable:
 	func _init() -> void:

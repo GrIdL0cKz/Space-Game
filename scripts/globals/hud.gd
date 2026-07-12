@@ -20,6 +20,7 @@ var suit_label: Label
 
 var inv_panel: PanelContainer
 var inv_grid: GridContainer
+var inv_big_icon: TextureRect
 var inv_name: Label
 var inv_desc: Label
 var inv_use_btn: Button
@@ -57,7 +58,9 @@ func _ready() -> void:
 	_build_pause()
 	_build_save_panel()
 	_build_load_panel()
+	_build_hotbar()
 	GameState.suit_changed.connect(_refresh_suit_indicator)
+	GameState.suit_changed.connect(_refresh_hotbar)
 	GameState.inventory_changed.connect(_refresh_inventory)
 	_refresh_suit_indicator()
 
@@ -77,6 +80,11 @@ func any_overlay_open() -> bool:
 func _unhandled_input(event: InputEvent) -> void:
 	if not _in_world():
 		return
+	if event is InputEventKey and event.pressed and not event.echo and not any_overlay_open():
+		if event.keycode >= KEY_1 and event.keycode <= KEY_6:
+			_hotbar_key(event.keycode - KEY_1)
+			get_viewport().set_input_as_handled()
+			return
 	if event.is_action_pressed("inventory") and not (reader_panel.visible or pause_panel.visible or save_panel.visible or load_panel.visible or modal != null):
 		_toggle_inventory()
 		get_viewport().set_input_as_handled()
@@ -176,29 +184,42 @@ func _refresh_suit_indicator() -> void:
 
 # ------------------------------------------------------------- inventory
 
+const ICON_DIR := "res://assets/icons"
+
+func _icon(id: String) -> Texture2D:
+	var path := "%s/%s.png" % [ICON_DIR, id]
+	if ResourceLoader.exists(path):
+		return load(path)
+	return null
+
 func _build_inventory() -> void:
-	inv_panel = _panel(Vector2(980, 560))
+	inv_panel = _panel(Vector2(980, 620))
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 28)
 	inv_panel.add_child(row)
 	var left := VBoxContainer.new()
-	left.custom_minimum_size = Vector2(520, 0)
+	left.custom_minimum_size = Vector2(500, 0)
 	row.add_child(left)
 	left.add_child(_label("BACKPACK", 30, ACCENT))
 	inv_grid = GridContainer.new()
-	inv_grid.columns = 2
-	inv_grid.add_theme_constant_override("h_separation", 10)
-	inv_grid.add_theme_constant_override("v_separation", 8)
+	inv_grid.columns = 5
+	inv_grid.add_theme_constant_override("h_separation", 12)
+	inv_grid.add_theme_constant_override("v_separation", 12)
 	left.add_child(inv_grid)
 	var right := VBoxContainer.new()
-	right.custom_minimum_size = Vector2(380, 0)
+	right.custom_minimum_size = Vector2(400, 0)
 	right.add_theme_constant_override("separation", 12)
 	row.add_child(right)
+	inv_big_icon = TextureRect.new()
+	inv_big_icon.custom_minimum_size = Vector2(96, 96)
+	inv_big_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	inv_big_icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	right.add_child(inv_big_icon)
 	inv_name = _label("", 26, INK)
 	right.add_child(inv_name)
 	inv_desc = _label("", 20, DIM)
 	inv_desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	inv_desc.custom_minimum_size = Vector2(380, 260)
+	inv_desc.custom_minimum_size = Vector2(400, 200)
 	inv_desc.size_flags_vertical = Control.SIZE_FILL
 	right.add_child(inv_desc)
 	inv_use_btn = _button("USE", _on_inv_use)
@@ -212,7 +233,41 @@ func _toggle_inventory() -> void:
 		Sd.play(&"switch_click", -8.0)
 		_refresh_inventory()
 
+func _slot_button(id: String, count: int) -> Button:
+	var b := Button.new()
+	b.custom_minimum_size = Vector2(84, 84)
+	b.pressed.connect(_on_inv_select.bind(id))
+	var tex := TextureRect.new()
+	tex.texture = _icon(id)
+	tex.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	tex.set_anchors_preset(Control.PRESET_FULL_RECT)
+	tex.offset_left = 8
+	tex.offset_top = 8
+	tex.offset_right = -8
+	tex.offset_bottom = -8
+	tex.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	b.add_child(tex)
+	if count > 1:
+		var badge := Label.new()
+		badge.text = "x%d" % count
+		badge.add_theme_font_size_override("font_size", 15)
+		badge.add_theme_color_override("font_color", INK)
+		badge.position = Vector2(52, 60)
+		badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		b.add_child(badge)
+	if id in ["suit_torso", "suit_helmet"] and GameState.is_equipped(id):
+		var worn := Label.new()
+		worn.text = "WORN"
+		worn.add_theme_font_size_override("font_size", 12)
+		worn.add_theme_color_override("font_color", ACCENT)
+		worn.position = Vector2(6, 2)
+		worn.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		b.add_child(worn)
+	b.tooltip_text = Items.display_name(id)
+	return b
+
 func _refresh_inventory() -> void:
+	_refresh_hotbar()
 	if not inv_panel.visible:
 		return
 	for c in inv_grid.get_children():
@@ -220,20 +275,12 @@ func _refresh_inventory() -> void:
 	var ids: Array = GameState.inventory.keys()
 	ids.sort()
 	for id in ids:
-		var count := int(GameState.inventory[id])
-		var text := Items.display_name(id)
-		if count > 1:
-			text += "  x%d" % count
-		if id in ["suit_torso", "suit_helmet"] and GameState.is_equipped(id):
-			text += "  [WORN]"
-		var b := _button(text, _on_inv_select.bind(String(id)))
-		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		b.custom_minimum_size = Vector2(250, 40)
-		inv_grid.add_child(b)
+		inv_grid.add_child(_slot_button(String(id), int(GameState.inventory[id])))
 	if ids.is_empty():
-		inv_grid.add_child(_label("(an empty backpack, a full heart)", 20, DIM))
+		inv_grid.add_child(_label("(an empty backpack, a full heart)", 18, DIM))
 	if not ids.has(inv_selected):
 		inv_selected = ""
+		inv_big_icon.texture = null
 		inv_name.text = ""
 		inv_desc.text = ""
 		inv_use_btn.visible = false
@@ -241,6 +288,7 @@ func _refresh_inventory() -> void:
 func _on_inv_select(id: String) -> void:
 	inv_selected = id
 	var def := Items.get_def(id)
+	inv_big_icon.texture = _icon(id)
 	inv_name.text = Items.display_name(id)
 	inv_desc.text = String(def.get("desc", ""))
 	var kind := String(def.get("kind", "material"))
@@ -256,20 +304,26 @@ func _on_inv_select(id: String) -> void:
 func _on_inv_use() -> void:
 	if inv_selected == "":
 		return
-	var def := Items.get_def(inv_selected)
+	_item_action(inv_selected)
+
+## The one item-verb pipeline: inventory button and hotbar keys both land here.
+func _item_action(id: String) -> void:
+	var def := Items.get_def(id)
 	match String(def.get("kind", "")):
 		"equip":
-			var worn := not GameState.is_equipped(inv_selected)
-			GameState.set_equipped(inv_selected, worn)
-			Sd.play(&"helmet_seal" if inv_selected == "suit_helmet" else &"suit_equip")
-			toast("%s: %s" % [Items.display_name(inv_selected), "sealed" if worn else "removed"])
+			var worn := not GameState.is_equipped(id)
+			GameState.set_equipped(id, worn)
+			Sd.play(&"helmet_seal" if id == "suit_helmet" else &"suit_equip")
+			toast("%s: %s" % [Items.display_name(id), "sealed" if worn else "removed"])
 			_refresh_inventory()
-			_on_inv_select(inv_selected)
+			if inv_panel.visible:
+				_on_inv_select(id)
 		"read":
-			_toggle_inventory()
+			if inv_panel.visible:
+				_toggle_inventory()
 			open_reader(String(def.get("text_id", "")))
 		"use":
-			match inv_selected:
+			match id:
 				"protein_bar":
 					GameState.remove_item("protein_bar")
 					Sd.play(&"eat")
@@ -281,6 +335,72 @@ func _on_inv_use() -> void:
 					toast("You give it a confident spin. Morale +1 (not a real stat).")
 				_:
 					toast("No obvious application. Yet.")
+		_:
+			toast("It is what it is. The lab scanner might say more.")
+
+# ------------------------------------------------------------- hotbar
+
+var hotbar_box: HBoxContainer
+var hotbar_ids: Array = []
+
+func _build_hotbar() -> void:
+	hotbar_box = HBoxContainer.new()
+	hotbar_box.add_theme_constant_override("separation", 8)
+	hotbar_box.position = Vector2(660, 1004)
+	add_child(hotbar_box)
+	_refresh_hotbar()
+
+func _refresh_hotbar() -> void:
+	if hotbar_box == null:
+		return
+	for c in hotbar_box.get_children():
+		c.queue_free()
+	hotbar_ids = []
+	var ids: Array = GameState.inventory.keys()
+	ids.sort_custom(func(a, b):
+		var ka := String(Items.get_def(String(a)).get("kind", "material"))
+		var kb := String(Items.get_def(String(b)).get("kind", "material"))
+		var order := {"equip": 0, "use": 1, "read": 2, "key": 3, "material": 4}
+		return int(order.get(ka, 5)) < int(order.get(kb, 5)))
+	for id in ids:
+		if hotbar_ids.size() >= 6:
+			break
+		var kind := String(Items.get_def(String(id)).get("kind", "material"))
+		if kind in ["equip", "use", "read"]:
+			hotbar_ids.append(String(id))
+	for i in hotbar_ids.size():
+		var slot := PanelContainer.new()
+		var style := StyleBoxFlat.new()
+		style.bg_color = Color(0.07, 0.086, 0.118, 0.85)
+		style.border_color = PANEL_EDGE
+		style.set_border_width_all(2)
+		style.set_content_margin_all(6)
+		slot.add_theme_stylebox_override("panel", style)
+		slot.custom_minimum_size = Vector2(64, 64)
+		var tex := TextureRect.new()
+		tex.texture = _icon(hotbar_ids[i])
+		tex.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		slot.add_child(tex)
+		var num := Label.new()
+		num.text = str(i + 1)
+		num.add_theme_font_size_override("font_size", 13)
+		num.add_theme_color_override("font_color", DIM)
+		num.position = Vector2(4, 2)
+		num.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		slot.add_child(num)
+		if hotbar_ids[i] in ["suit_torso", "suit_helmet"] and GameState.is_equipped(hotbar_ids[i]):
+			var dot := ColorRect.new()
+			dot.color = ACCENT
+			dot.size = Vector2(10, 10)
+			dot.position = Vector2(48, 4)
+			dot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			slot.add_child(dot)
+		hotbar_box.add_child(slot)
+
+func _hotbar_key(index: int) -> void:
+	if index < hotbar_ids.size():
+		_item_action(hotbar_ids[index])
+		Sd.play(&"switch_click", -12.0)
 
 # ------------------------------------------------------------- reader
 
