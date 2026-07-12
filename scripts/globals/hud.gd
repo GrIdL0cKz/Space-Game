@@ -66,7 +66,9 @@ func _in_world() -> bool:
 	return scene != null and scene.is_in_group("world")
 
 func _process(_delta: float) -> void:
-	visible = _in_world()
+	# The load panel is also the main menu's Load Game screen, so the layer
+	# stays alive for it outside gameplay scenes.
+	visible = _in_world() or load_panel.visible
 
 func any_overlay_open() -> bool:
 	return inv_panel.visible or reader_panel.visible or pause_panel.visible \
@@ -472,7 +474,9 @@ func _build_load_panel() -> void:
 	v.add_child(_button("BACK", func():
 		load_panel.visible = false
 		if _in_world():
-			pause_panel.visible = true))
+			pause_panel.visible = true
+		else:
+			get_tree().paused = false))
 
 func open_load_panel() -> void:
 	pause_panel.visible = false
