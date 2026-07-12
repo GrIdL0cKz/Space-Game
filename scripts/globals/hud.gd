@@ -140,7 +140,8 @@ func _button(text: String, cb: Callable) -> Button:
 
 func _build_toast() -> void:
 	toast_label = _label("", 24)
-	toast_label.position = Vector2(0, 990)
+	# Sits clear of the hotbar (y1004) and the computer box (bottom-left).
+	toast_label.position = Vector2(0, 884)
 	toast_label.size = Vector2(1920, 40)
 	toast_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	toast_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.9))
@@ -346,7 +347,7 @@ var hotbar_ids: Array = []
 func _build_hotbar() -> void:
 	hotbar_box = HBoxContainer.new()
 	hotbar_box.add_theme_constant_override("separation", 8)
-	hotbar_box.position = Vector2(660, 1004)
+	hotbar_box.position = Vector2(688, 1004)
 	add_child(hotbar_box)
 	_refresh_hotbar()
 
@@ -462,7 +463,7 @@ func _close_reader() -> void:
 # ------------------------------------------------- ship computer line box
 
 func _build_computer_box() -> void:
-	computer_box = _panel(Vector2(660, 0), false)
+	computer_box = _panel(Vector2(640, 0), false)
 	computer_box.position = Vector2(24, 930)
 	computer_label = _label("", 21, ACCENT)
 	computer_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART

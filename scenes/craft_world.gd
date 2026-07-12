@@ -78,7 +78,9 @@ func _door(label: String, x: float, deck_y: float, target: String, spawn: Vector
 	door_sprite.scale = Vector2(0.82, 0.82)
 	door_sprite.z_index = -1
 	add_child(door_sprite)
-	_sign(label, x, floor_top - 132.0)
+	# Deck interiors are only 92px tall; the plate straddles the ceiling
+	# line like a mounted sign instead of vanishing behind the deck above.
+	_sign(label, x, floor_top - 105.0)
 	_spot(Doorway.make("To: %s" % label, target, spawn, req, locked), Vector2(x, deck_y - 40))
 
 func _sign(text: String, x: float, y: float) -> void:
@@ -88,14 +90,14 @@ func _sign(text: String, x: float, y: float) -> void:
 	style.border_color = Color(0, 0, 0)
 	style.set_border_width_all(2)
 	plate.add_theme_stylebox_override("panel", style)
-	var w := maxf(84.0, text.length() * 10.0 + 16.0)
-	plate.size = Vector2(w, 22)
+	var w := maxf(96.0, text.length() * 12.0 + 18.0)
+	plate.size = Vector2(w, 26)
 	plate.position = Vector2(x - w / 2.0, y)
-	plate.z_index = -1
+	plate.z_index = 10
 	add_child(plate)
 	var l := Label.new()
 	l.text = text.to_upper()
-	l.add_theme_font_size_override("font_size", 12)
+	l.add_theme_font_size_override("font_size", 15)
 	l.add_theme_color_override("font_color", Color(0.92, 0.95, 0.98))
 	l.set_anchors_preset(Control.PRESET_FULL_RECT)
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

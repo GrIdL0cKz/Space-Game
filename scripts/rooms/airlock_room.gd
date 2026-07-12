@@ -51,5 +51,5 @@ class OuterDoor extends Interactable:
 			return
 		GameState.set_flag("went_eva")
 		Sd.play(&"airlock_clunk")
-		SaveManager._pending_pos = [220.0, 631.0]
+		SaveManager._pending_pos = [400.0, 545.0]
 		get_tree().change_scene_to_file.call_deferred("res://scenes/rooms/eva_outside.tscn")

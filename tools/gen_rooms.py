@@ -118,8 +118,9 @@ tube(d, rnd_seed=3)
 door_recess(d, 60)
 # workbench with scanner dome (player-height bench)
 outline_rect(d, [420, FLOOR_TOP - 52, 760, FLOOR_TOP], METAL)
-d.ellipse([540, FLOOR_TOP - 108, 650, FLOOR_TOP - 48], fill=SCREEN_BG, outline=LINE, width=3)
-d.ellipse([583, FLOOR_TOP - 122, 607, FLOOR_TOP - 98], fill=AMBER, outline=LINE, width=2)
+d.ellipse([548, FLOOR_TOP - 92, 642, FLOOR_TOP - 46], fill=(150, 190, 205), outline=LINE, width=3)
+d.arc([560, FLOOR_TOP - 86, 630, FLOOR_TOP - 56], 200, 320, fill=SKIN, width=3)
+d.ellipse([585, FLOOR_TOP - 60, 605, FLOOR_TOP - 46], fill=AMBER, outline=LINE, width=2)
 # wall screens in the band
 screen(d, [840, INT_TOP + 14, 1080, INT_TOP + 66], "wave")
 screen(d, [1110, INT_TOP + 14, 1250, INT_TOP + 66], "bars")
@@ -262,5 +263,60 @@ outline_rect(d, [1350, INT_TOP + 14, 1420, FLOOR_TOP - 6], (180, 210, 225), 3)  
 for i, px in enumerate(range(1500, 1720, 70)):
     outline_rect(d, [px, INT_TOP + 20, px + 48, INT_TOP + 58], [(200, 190, 170), (170, 190, 200), (190, 170, 180)][i % 3], 2)
 save(img, "crew_quarters")
+
+
+# ------------------------------------------------------- EVA stern (RGBA)
+# The back of the Perennial, seen from outside during the EVA. Same flat
+# black-outline language as the hull: white skin, blue stripe, riveted
+# band, three engine bells, the outer hatch, and the ship's name.
+st = Image.new("RGBA", (620, 1000), (0, 0, 0, 0))
+d = ImageDraw.Draw(st)
+HX = 300  # hull slab right edge
+d.rectangle([0, 60, HX, 940], fill=SKIN, outline=LINE, width=5)
+# stripes continuing the tube bands
+for sy in [150, 815]:
+    d.rectangle([0, sy, HX, sy + 26], fill=STRIPE)
+# riveted mid band like the deck floors
+d.rectangle([0, 470, HX, 530], fill=FLOOR, outline=LINE, width=3)
+for rx in range(16, HX - 8, 44):
+    d.line([rx, 484, rx + 14, 484], fill=FLOOR_TICK, width=4)
+    d.line([rx + 22, 512, rx + 36, 512], fill=FLOOR_TICK, width=4)
+# panel seams
+for sy in [240, 350, 620, 730]:
+    d.line([12, sy, HX - 12, sy], fill=(205, 213, 220), width=4)
+# scorch marks from the strike
+for (ex0, ey0, ex1, ey1) in [(150, 268, 250, 320), (60, 588, 140, 640), (190, 700, 262, 744)]:
+    d.ellipse([ex0, ey0, ex1, ey1], fill=(96, 102, 110, 160))
+    d.ellipse([ex0 + 18, ey0 + 10, ex1 - 14, ey1 - 8], fill=(60, 64, 72, 200))
+# stern cap
+d.rectangle([HX, 100, HX + 70, 900], fill=DARKMETAL, outline=LINE, width=5)
+for sy in [220, 420, 620, 820]:
+    d.line([HX + 10, sy, HX + 60, sy], fill=(70, 76, 84), width=4)
+# engine bells: rim, cone widening right, dark nozzle mouth
+for by in [260, 500, 740]:
+    d.rectangle([HX + 70, by - 34, HX + 96, by + 34], fill=METAL, outline=LINE, width=4)
+    d.polygon([(HX + 96, by - 30), (HX + 210, by - 62), (HX + 210, by + 62), (HX + 96, by + 30)],
+              fill=METAL, outline=LINE)
+    d.ellipse([HX + 196, by - 58, HX + 224, by + 58], fill=(30, 34, 40), outline=LINE, width=4)
+# RCS cluster up top
+for i, ry in enumerate([116, 140]):
+    d.rectangle([HX + 8, ry, HX + 40, ry + 16], fill=METAL, outline=LINE, width=3)
+# outer hatch where the airlock returns you (world ~x230, y540 - canvas y-40)
+d.ellipse([170, 440, 280, 550], fill=(222, 232, 238), outline=LINE, width=5)
+d.ellipse([196, 466, 254, 524], fill=DARKMETAL, outline=LINE, width=4)
+d.line([225, 466, 225, 524], fill=LINE, width=5)
+d.line([196, 495, 254, 495], fill=LINE, width=5)
+# ship name stencil, vertical
+try:
+    from PIL import ImageFont
+    fnt = ImageFont.truetype("C:/Windows/Fonts/arialbd.ttf", 36)
+    tw_img = Image.new("RGBA", (260, 48), (0, 0, 0, 0))
+    ImageDraw.Draw(tw_img).text((0, 0), "PERENNIAL", font=fnt, fill=(96, 102, 110, 255))
+    tw_img = tw_img.rotate(90, expand=True)
+    st.paste(tw_img, (34, 560), tw_img)
+except Exception:
+    pass
+st.save(os.path.join(OUT, "eva_stern.png"))
+print("stern saved")
 
 print("done - all rooms at hull scale")

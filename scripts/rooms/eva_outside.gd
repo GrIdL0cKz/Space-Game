@@ -41,46 +41,19 @@ func _build_backdrop() -> void:
 		add_child(star)
 
 func _build_stern() -> void:
-	# The back of the ship: hull slab, engine bells, the blue stripe - the
-	# same ship you know, from the side nobody visits.
-	var hull := ColorRect.new()
-	hull.color = Color(0.95, 0.96, 0.97)
-	hull.size = Vector2(220, 760)
-	hull.position = Vector2(0, 160)
-	hull.z_index = -10
-	add_child(hull)
-	var stripe := ColorRect.new()
-	stripe.color = Color(0.41, 0.76, 0.92)
-	stripe.size = Vector2(220, 26)
-	stripe.position = Vector2(0, 200)
-	stripe.z_index = -9
-	add_child(stripe)
-	var edge := ColorRect.new()
-	edge.color = Color(0, 0, 0)
-	edge.position = Vector2(220, 160)
-	edge.size = Vector2(6, 760)
-	edge.z_index = -9
-	add_child(edge)
-	for by in [330.0, 560.0, 790.0]:
-		var bell := Polygon2D.new()
-		bell.polygon = PackedVector2Array([
-			Vector2(226, by), Vector2(320, by - 46), Vector2(320, by + 46)])
-		bell.color = Color(0.32, 0.36, 0.42)
-		bell.z_index = -9
-		add_child(bell)
-	var plate_seams := [260.0, 480.0, 700.0]
-	for sy in plate_seams:
-		var seam := ColorRect.new()
-		seam.color = Color(0.62, 0.68, 0.72)
-		seam.position = Vector2(0, sy)
-		seam.size = Vector2(220, 5)
-		seam.z_index = -9
-		add_child(seam)
+	# The back of the ship, drawn in the hull's own flat-outline style by
+	# tools/gen_rooms.py - the same ship you know, from the side nobody visits.
+	var stern := Sprite2D.new()
+	stern.texture = load("res://astronaught/environs/rooms/eva_stern.png")
+	stern.centered = false
+	stern.position = Vector2(0, 40)
+	stern.z_index = -10
+	add_child(stern)
 
 func _build_player() -> void:
 	player = preload("res://actors/entities/player.tscn").instantiate()
 	var pending: Variant = SaveManager.consume_pending_position()
-	player.global_position = pending if pending is Vector2 else Vector2(340, 540)
+	player.global_position = pending if pending is Vector2 else Vector2(430, 530)
 	add_child(player)
 	player.set_physics_process(false)
 	camera = Camera2D.new()
