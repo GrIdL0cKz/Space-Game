@@ -71,5 +71,3 @@ input_pickable = false
 position = Vector2(0, 19)
 shape = SubResource("RectangleShape2D_4enjq")
 
-[connection signal="input_event" from="." to="." method="_on_input_event"]
-[connection signal="body_entered" from="Area2D" to="." method="_on_area_2d_body_entered"]

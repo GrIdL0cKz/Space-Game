@@ -1,0 +1,146 @@
+Godot Engine v4.4.1.stable.official.49a5bc7b6 - https://godotengine.org
+
+first_scan_filesystem: begin: Project initialization steps: 5
+	first_scan_filesystem: step 0: Scanning file structure...
+	first_scan_filesystem: step 1: Loading global class names...
+	first_scan_filesystem: step 2: Verifying GDExtensions...
+	first_scan_filesystem: step 3: Creating autoload scripts...
+	first_scan_filesystem: step 4: Initializing plugins...
+WARNING: Adding 'InformationSection' as child to '_PanelContainer_22285' will make owner 'Text' inconsistent. Consider unsetting the owner beforehand.
+   at: add_child (scene/main/node.cpp:1664)
+WARNING: Adding 'InfoSection' as child to '_PanelContainer_22304' will make owner 'Saving' inconsistent. Consider unsetting the owner beforehand.
+   at: add_child (scene/main/node.cpp:1664)
+WARNING: Adding 'InfoSection' as child to '_PanelContainer_22317' will make owner 'Translations' inconsistent. Consider unsetting the owner beforehand.
+   at: add_child (scene/main/node.cpp:1664)
+WARNING: Trying to access a non-existing editor theme font 'main_button_font' in 'EditorFonts'.
+   at: get_font (editor/themes/editor_theme.cpp:70)
+	first_scan_filesystem: step 5: Starting file scan...
+first_scan_filesystem: end
+update_scripts_classes: begin: Registering global classes... steps: 11
+	update_scripts_classes: step 0: 
+	update_scripts_classes: step 1: 
+	update_scripts_classes: step 2: 
+	update_scripts_classes: step 3: 
+	update_scripts_classes: step 4: 
+	update_scripts_classes: step 5: 
+	update_scripts_classes: step 6: Items
+	update_scripts_classes: step 7: 
+	update_scripts_classes: step 8: 
+	update_scripts_classes: step 9: Texts
+	update_scripts_classes: step 10: Interactable
+update_scripts_classes: end
+_update_scan_actions: begin: Scanning actions... steps: 23
+	_update_scan_actions: step 0: airlock_clunk.wav
+	_update_scan_actions: step 1: airlock_hiss.wav
+	_update_scan_actions: step 2: alarm_short.wav
+	_update_scan_actions: step 3: breaker_thunk.wav
+	_update_scan_actions: step 4: computer_blip.wav
+	_update_scan_actions: step 5: console_boot.wav
+	_update_scan_actions: step 6: death_thud.wav
+	_update_scan_actions: step 7: door_slide.wav
+	_update_scan_actions: step 8: eat.wav
+	_update_scan_actions: step 9: elevator_hum.wav
+	_update_scan_actions: step 10: footstep.wav
+	_update_scan_actions: step 11: helmet_seal.wav
+	_update_scan_actions: step 12: paper.wav
+	_update_scan_actions: step 13: pickup.wav
+	_update_scan_actions: step 14: scanner_done.wav
+	_update_scan_actions: step 15: scanner_sweep.wav
+	_update_scan_actions: step 16: suit_equip.wav
+	_update_scan_actions: step 17: switch_click.wav
+	_update_scan_actions: step 18: tether_latch.wav
+	_update_scan_actions: step 19: thruster_puff.wav
+	_update_scan_actions: step 20: valve_turn.wav
+	_update_scan_actions: step 21: wire_connect.wav
+	_update_scan_actions: step 22: wire_spark.wav
+_update_scan_actions: end
+reimport: begin: (Re)Importing Assets steps: 23
+	reimport: step 0: Preparing files to reimport...
+	reimport: step 1: Preparing files to reimport...
+	reimport: step 2: Preparing files to reimport...
+	reimport: step 3: Preparing files to reimport...
+	reimport: step 4: Preparing files to reimport...
+	reimport: step 5: Preparing files to reimport...
+	reimport: step 6: Preparing files to reimport...
+	reimport: step 7: Preparing files to reimport...
+	reimport: step 8: Preparing files to reimport...
+	reimport: step 9: Preparing files to reimport...
+	reimport: step 10: Preparing files to reimport...
+	reimport: step 11: Preparing files to reimport...
+	reimport: step 12: Preparing files to reimport...
+	reimport: step 13: Preparing files to reimport...
+	reimport: step 14: Preparing files to reimport...
+	reimport: step 15: Preparing files to reimport...
+	reimport: step 16: Preparing files to reimport...
+	reimport: step 17: Preparing files to reimport...
+	reimport: step 18: Preparing files to reimport...
+	reimport: step 19: Preparing files to reimport...
+	reimport: step 20: Preparing files to reimport...
+	reimport: step 21: Preparing files to reimport...
+	reimport: step 22: Preparing files to reimport...
+	reimport: step 0: Executing pre-reimport operations...
+	reimport: step 0: wire_spark.wav
+	reimport: step 1: wire_connect.wav
+	reimport: step 2: valve_turn.wav
+	reimport: step 3: thruster_puff.wav
+	reimport: step 4: tether_latch.wav
+	reimport: step 5: switch_click.wav
+	reimport: step 6: suit_equip.wav
+	reimport: step 7: scanner_sweep.wav
+	reimport: step 8: scanner_done.wav
+	reimport: step 12: footstep.wav
+	reimport: step 13: elevator_hum.wav
+	reimport: step 14: eat.wav
+	reimport: step 15: door_slide.wav
+	reimport: step 16: death_thud.wav
+	reimport: step 17: console_boot.wav
+	reimport: step 18: computer_blip.wav
+	reimport: step 19: breaker_thunk.wav
+	reimport: step 20: alarm_short.wav
+	reimport: step 21: airlock_hiss.wav
+	reimport: step 23: Finalizing Asset Import...
+reimport: end
+update_script_paths_documentation: begin: Updating scripts documentation steps: 11
+SCRIPT ERROR: Parse Error: Cannot infer the type of "tapped" variable because the value doesn't have a set type.
+   at: GDScript::reload (res://scripts/interact/interactable.gd:30)
+SCRIPT ERROR: Parse Error: Cannot infer the type of "clicked" variable because the value doesn't have a set type.
+   at: GDScript::reload (res://scripts/interact/interactable.gd:31)
+SCRIPT ERROR: Compile Error: Failed to compile depended scripts.
+   at: GDScript::reload (res://actors/entities/player.gd:0)
+ERROR: Failed to load script "res://actors/entities/player.gd" with error "Parse error".
+   at: load (modules/gdscript/gdscript.cpp:3022)
+	update_script_paths_documentation: step 0: player.gd
+SCRIPT ERROR: Parse Error: Could not resolve class "Interactable".
+   at: GDScript::reload (res://actors/objects/Elevator.gd:1)
+SCRIPT ERROR: Parse Error: Cannot infer the type of "panel" variable because the value doesn't have a set type.
+   at: GDScript::reload (res://actors/objects/Elevator.gd:19)
+ERROR: Failed to load script "res://actors/objects/Elevator.gd" with error "Parse error".
+   at: load (modules/gdscript/gdscript.cpp:3022)
+	update_script_paths_documentation: step 1: Elevator.gd
+SCRIPT ERROR: Parse Error: Cannot infer the type of "tapped" variable because the value doesn't have a set type.
+   at: GDScript::reload (res://scenes/craft_world.gd:18)
+ERROR: Failed to load script "res://scenes/craft_world.gd" with error "Parse error".
+   at: load (modules/gdscript/gdscript.cpp:3022)
+	update_script_paths_documentation: step 2: craft_world.gd
+	update_script_paths_documentation: step 3: death.gd
+	update_script_paths_documentation: step 4: game_state.gd
+	update_script_paths_documentation: step 5: hud.gd
+	update_script_paths_documentation: step 6: items.gd
+	update_script_paths_documentation: step 7: save_manager.gd
+	update_script_paths_documentation: step 8: sd.gd
+	update_script_paths_documentation: step 9: texts.gd
+	update_script_paths_documentation: step 10: interactable.gd
+update_script_paths_documentation: end
+reimport: begin: (Re)Importing Assets steps: 23
+	reimport: step 0: Executing post-reimport operations...
+reimport: end
+loading_editor_layout: begin: Loading editor steps: 5
+	loading_editor_layout: step 0: Loading editor layout...
+	loading_editor_layout: step 1: Loading docks...
+	loading_editor_layout: step 2: Reopening scenes...
+	loading_editor_layout: step 3: Loading central editor layout...
+	loading_editor_layout: step 4: Loading plugin window layout...
+	loading_editor_layout: step 5: Editor layout ready.
+loading_editor_layout: end
+WARNING: ObjectDB instances leaked at exit (run with --verbose for details).
+   at: cleanup (core/object/object.cpp:2378)
