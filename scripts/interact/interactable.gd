@@ -1,8 +1,8 @@
 class_name Interactable
 extends Area2D
 ## Anything the player can act on: doors, lockers, consoles, bodies, panels.
-## Walk into range and press E (a prompt floats over the player), or click it
-## - the player walks over and interacts on arrival, adventure-game style.
+## Walk into range and press E (the prompt shows above the hotbar), or click
+## it while in range. Clicking never steers the player - that got annoying.
 ## Subclasses override _interact(); `enabled` gates broken/unpowered things.
 
 @export var prompt: String = "Look"
@@ -33,8 +33,8 @@ func _on_click(_viewport: Node, event: InputEvent, _shape: int) -> void:
 	if not (tapped or clicked):
 		return
 	var player := get_tree().get_first_node_in_group("player")
-	if player != null and player.has_method("approach_and_interact"):
-		player.approach_and_interact(self)
+	if player != null and "in_range" in player and player.in_range.has(self):
+		try_interact(player)
 		get_viewport().set_input_as_handled()
 
 func try_interact(player: Node) -> void:

@@ -16,7 +16,7 @@ func _ready() -> void:
 	add_child(mood)
 	if not bool(GameState.get_flag("derelict_first_step")):
 		GameState.set_flag("derelict_first_step")
-		Hud.toast("Dust. Cold. Two years of stillness, and every light left on.")
+		Hud.toast("Dust. Cold. Stillness, and every light left on.")
 
 func _populate() -> void:
 	add_spot(CastOff.new(), 110, Vector2(160, 200))
@@ -26,7 +26,7 @@ func _populate() -> void:
 			"Their spares became your spares. Two years is long enough for salvage to stop being stealing."),
 			620)
 	add_spot(FlavourSpot.make("Emergency lamp", [
-		"Two years on and it is still trying. You find you respect it.",
+		"Still burning. However long it has been, it is still trying, and you find you respect it.",
 	]), 778, Vector2(160, 200))
 	add_spot(Searchable.make("Supply locker", "reprieve_locker",
 			["medkit", "protein_bar"],
@@ -50,7 +50,9 @@ class CastOff extends Interactable:
 		prompt = "Lander - cast off"
 	func _interact(_player: Node) -> void:
 		Sd.play(&"airlock_clunk")
-		SaveManager._pending_pos = [4565.0, 700.0]
+		# Push off well clear of the hatch: spawning inside the dock radius
+		# used to re-dock you instantly, forever.
+		SaveManager._pending_pos = [4230.0, 880.0]
 		get_tree().change_scene_to_file.call_deferred("res://scenes/lander/lander_flight.tscn")
 
 class CommsCore extends Interactable:

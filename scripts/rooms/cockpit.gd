@@ -11,7 +11,7 @@ func _populate() -> void:
 	add_sign("Cockpit", 620)
 	var nav := NavConsole.new()
 	add_spot(nav, 615, Vector2(560, 170))
-	add_spot(AICore.new(), 190, Vector2(220, 200))
+	add_spot(AICore.new(), 1640, Vector2(220, 170))
 	add_spot(FlavourSpot.make("Pilot's seat", [
 		"You sit in it. You feel neither more nor less qualified.",
 		"There is a cup holder. There is no cup. Priorities were had.",

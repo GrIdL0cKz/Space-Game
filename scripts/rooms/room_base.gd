@@ -78,11 +78,11 @@ func add_spot(inst: Interactable, x: float, reach := Vector2(150, 170)) -> Inter
 func add_door(label: String, x: float, target: String, spawn: Vector2,
 		req_item := "", locked_line := "") -> void:
 	# Steel tint: the door art is white line-work and vanishes against the
-	# pale interior walls without it.
+	# pale interior walls without it. Bottom edge sits on the floor line.
 	var door_sprite := Sprite2D.new()
 	door_sprite.texture = load(DOOR_TEX)
-	door_sprite.position = Vector2(x, FLOOR_TOP - 64.0)
 	door_sprite.scale = Vector2(0.8, 0.8)
+	door_sprite.position = Vector2(x, FLOOR_TOP - door_sprite.texture.get_height() * 0.8 / 2.0)
 	door_sprite.modulate = Color(0.62, 0.7, 0.78)
 	door_sprite.z_index = -5
 	add_child(door_sprite)
@@ -111,10 +111,3 @@ func add_sign(text: String, x: float, y: float = INT_TOP - 16.0) -> void:
 	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	plate.add_child(l)
 
-func _unhandled_input(event: InputEvent) -> void:
-	if Hud.any_overlay_open() or player == null:
-		return
-	var tapped: bool = event is InputEventScreenTouch and not event.pressed
-	if tapped:
-		var world_pos: Vector2 = camera.get_global_mouse_position() if camera != null else event.position
-		player.move_to(Vector2(world_pos.x, player.global_position.y))

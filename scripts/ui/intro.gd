@@ -19,9 +19,13 @@ var tween: Tween
 var advancing: bool = false
 
 func _ready() -> void:
+	# Everything ignores the mouse, or the full-rect controls eat the
+	# clicks before _unhandled_input ever hears about them.
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var bg := ColorRect.new()
 	bg.color = Color(0.015, 0.012, 0.03)
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(bg)
 	var rnd := RandomNumberGenerator.new()
 	rnd.seed = 297
@@ -30,6 +34,7 @@ func _ready() -> void:
 		star.color = Color(0.9, 0.92, 0.96, rnd.randf_range(0.25, 0.9))
 		star.size = Vector2.ONE * (2 if rnd.randf() < 0.85 else 3)
 		star.position = Vector2(rnd.randf_range(0, 1920), rnd.randf_range(0, 1080))
+		star.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		add_child(star)
 	label = Label.new()
 	label.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -41,6 +46,7 @@ func _ready() -> void:
 	label.custom_minimum_size = Vector2(900, 0)
 	label.position = Vector2(0, 0)
 	label.modulate.a = 0.0
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(label)
 	var skip := Label.new()
 	skip.text = "click or any key: next    esc: skip"

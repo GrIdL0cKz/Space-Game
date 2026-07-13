@@ -16,6 +16,9 @@ var lander: Sprite2D
 var velocity := Vector2.ZERO
 var camera: Camera2D
 var done: bool = false
+# No docking for the first moments after undocking - belt and braces
+# against spawning anywhere near a hatch.
+var dock_grace: float = 1.5
 
 func _ready() -> void:
 	add_to_group("world")
@@ -82,7 +85,9 @@ func _physics_process(delta: float) -> void:
 	lander.rotation = clampf(velocity.y * 0.0006, -0.22, 0.22)
 	if velocity.length() > 8.0:
 		lander.flip_h = velocity.x < -12.0
-	_check_docks()
+	dock_grace = maxf(0.0, dock_grace - delta)
+	if dock_grace <= 0.0:
+		_check_docks()
 
 func _check_docks() -> void:
 	var hatch := DERELICT_POS + HATCH_OFFSET

@@ -65,23 +65,24 @@ func _place_ship_contents() -> void:
 	_spot(CoolantPanel.new(), Vector2(1010, DECK_TOP - 40))
 	_make_coolant_alarm(1010.0)
 	# --- Crawlspace.
-	# One ladder spot with a tall reach box: usable standing on deck 3 and
-	# crawling in the attic above it.
-	_spot(Ladder.new(), Vector2(50, 250), Vector2(150, 330))
-	_sign("Crawlspace", 160, DECK_TOP - 110)
+	# One ladder spot reaching deck 3 (standing) and the attic (crawling),
+	# but NOT deck 2 below - the box stops above a deck-2 head.
+	_spot(Ladder.new(), Vector2(50, 247), Vector2(150, 175))
+	# The junction box lives where Rob drew it: far right of the crawl.
 	var wires := WiringBox.new()
-	_spot(wires, Vector2(660, ATTIC_Y), Vector2(240, 140))
+	_spot(wires, Vector2(1480, ATTIC_Y), Vector2(220, 100))
 	_make_attic()
 
 func _door(label: String, x: float, deck_y: float, target: String, spawn: Vector2,
 		req := "", locked := "") -> void:
 	var floor_top: float = FLOOR_TOPS[deck_y]
 	# z 1 so the hull sprite (z 0) can't cover it, and a steel tint so the
-	# white line-art door reads as a door instead of more wall.
+	# white line-art door reads as a door instead of more wall. The bottom
+	# of the door sits exactly on the floor line.
 	var door_sprite := Sprite2D.new()
 	door_sprite.texture = load(DOOR_TEX)
-	door_sprite.position = Vector2(x, floor_top - 60.0)
 	door_sprite.scale = Vector2(0.82, 0.82)
+	door_sprite.position = Vector2(x, floor_top - door_sprite.texture.get_height() * 0.82 / 2.0)
 	door_sprite.modulate = Color(0.62, 0.7, 0.78)
 	door_sprite.z_index = 1
 	add_child(door_sprite)
@@ -111,7 +112,9 @@ func _sign(text: String, x: float, y: float) -> void:
 	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	plate.add_child(l)
 
-func _spot(inst: Interactable, pos: Vector2, reach := Vector2(150, 170)) -> void:
+func _spot(inst: Interactable, pos: Vector2, reach := Vector2(150, 130)) -> void:
+	# Reach boxes are shallow on purpose: a crawler in the attic must not
+	# be able to work deck-3 consoles through the floor.
 	var cs := CollisionShape2D.new()
 	var rect := RectangleShape2D.new()
 	rect.size = reach
@@ -229,19 +232,13 @@ func _first_waking_beat() -> void:
 	Hud.computer_say("AUTONOMIC WATCHDOG ONLINE. PRIMARY INTELLIGENCE: OFFLINE. CAUSE: CORE FUSE FAILURE.")
 	Hud.computer_say("RESTORE SEQUENCE: SPARE FUSE - STORES CRATE, THIS DECK. CORE RACK - COCKPIT, DECK 3. END OF ASSISTANCE.")
 
-func _unhandled_input(event: InputEvent) -> void:
-	if Hud.any_overlay_open():
-		return
-	var tapped: bool = event is InputEventScreenTouch and not event.pressed
-	if tapped:
-		$Player.move_to(Vector2(event.position.x, $Player.global_position.y))
-
 func on_elevator_floor_selected(floor_number: int) -> void:
 	for e in get_tree().get_nodes_in_group("Elevator"):
 		if e.floor_number == floor_number:
 			Sd.play(&"elevator_hum")
 			$Player.global_position = e.global_position
 			$Player.global_position.y += 64
+			$Player.velocity = Vector2.ZERO
 			break
 
 class Ladder extends Interactable:

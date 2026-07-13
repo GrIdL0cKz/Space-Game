@@ -12,6 +12,7 @@ const ACCENT := Color(0.47, 0.78, 0.90)
 const WARN := Color(1.0, 0.74, 0.31)
 
 var toast_label: Label
+var prompt_line: Label
 var toast_queue: Array[String] = []
 var toast_busy: bool = false
 
@@ -140,19 +141,39 @@ func _button(text: String, cb: Callable) -> Button:
 
 func _build_toast() -> void:
 	toast_label = _label("", 24)
-	# Sits clear of the hotbar (y1004) and the computer box (bottom-left).
-	toast_label.position = Vector2(0, 884)
+	# Sits clear of the hotbar (y1004), the prompt line (y948) and the
+	# bottom-anchored computer box (grows up from y990, left side).
+	toast_label.position = Vector2(0, 812)
 	toast_label.size = Vector2(1920, 40)
 	toast_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	toast_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.9))
 	toast_label.add_theme_constant_override("outline_size", 6)
 	toast_label.modulate.a = 0.0
 	add_child(toast_label)
+	# The interaction prompt: one line above the hotbar, room for detail.
+	prompt_line = _label("", 22)
+	prompt_line.position = Vector2(0, 948)
+	prompt_line.size = Vector2(1920, 36)
+	prompt_line.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	prompt_line.add_theme_color_override("font_color", Color(0.92, 0.96, 1.0))
+	prompt_line.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.9))
+	prompt_line.add_theme_constant_override("outline_size", 5)
+	add_child(prompt_line)
+
+func set_prompt(text: String) -> void:
+	if prompt_line != null:
+		prompt_line.text = text
+
+var _toast_tween: Tween = null
 
 func toast(text: String) -> void:
-	toast_queue.append(text)
-	if not toast_busy:
-		_next_toast()
+	# The newest line wins immediately: a fresh interaction clears whatever
+	# was still fading, so re-pressing E always re-shows the text.
+	toast_queue = [text]
+	if _toast_tween != null and _toast_tween.is_valid():
+		_toast_tween.kill()
+	toast_busy = false
+	_next_toast()
 
 func _next_toast() -> void:
 	if toast_queue.is_empty():
@@ -160,11 +181,13 @@ func _next_toast() -> void:
 		return
 	toast_busy = true
 	toast_label.text = toast_queue.pop_front()
-	var tw := create_tween()
-	tw.tween_property(toast_label, "modulate:a", 1.0, 0.15)
-	tw.tween_interval(1.9)
-	tw.tween_property(toast_label, "modulate:a", 0.0, 0.4)
-	tw.tween_callback(_next_toast)
+	# Long lines earn long holds; nobody speed-reads a captain's epitaph.
+	var hold := clampf(1.2 + toast_label.text.length() * 0.05, 2.0, 8.0)
+	_toast_tween = create_tween()
+	_toast_tween.tween_property(toast_label, "modulate:a", 1.0, 0.15)
+	_toast_tween.tween_interval(hold)
+	_toast_tween.tween_property(toast_label, "modulate:a", 0.0, 0.4)
+	_toast_tween.tween_callback(_next_toast)
 
 # ------------------------------------------------------------- suit status
 
@@ -469,11 +492,11 @@ func _close_reader() -> void:
 # ------------------------------------------------- ship computer line box
 
 func _build_computer_box() -> void:
-	computer_box = _panel(Vector2(640, 0), false)
+	computer_box = _panel(Vector2(548, 0), false)
 	computer_box.position = Vector2(24, 930)
 	computer_label = _label("", 21, ACCENT)
 	computer_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	computer_label.custom_minimum_size = Vector2(600, 0)
+	computer_label.custom_minimum_size = Vector2(508, 0)
 	computer_box.add_child(computer_label)
 
 func computer_say(text: String) -> void:
@@ -499,6 +522,9 @@ func _computer_next() -> void:
 	for i in line.length():
 		tw.tween_callback(func():
 			computer_label.text = line.substr(0, computer_label.text.length() + 1)
+			# Grow upward from a fixed bottom edge so long speeches never
+			# run off-screen into the hotbar.
+			computer_box.position.y = 990.0 - computer_box.size.y
 			if computer_label.text.length() % 3 == 0:
 				Sd.play(&"computer_blip", -18.0, 1.4)
 		)

@@ -74,6 +74,12 @@ static func open_wiring() -> void:
 	right.add_theme_constant_override("separation", 10)
 	row.add_child(left)
 	var status := _label("", 22, WARN)
+	# Without a floor on its width the autowrap label collapses to one
+	# letter per line and the box goes lopsided.
+	status.custom_minimum_size = Vector2(360, 0)
+	status.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	status.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	row.add_child(status)
 	row.add_child(right)
 	var picked: Array = [-1]
@@ -126,7 +132,7 @@ static func open_wiring() -> void:
 # sample and, for story items, says something worth hearing.
 
 const SCAN_RESULTS := {
-	"sample_rock": "Composition: nickel-iron, trace iridium. Verdict: asteroid shrapnel, the same family that hit the ship. It travelled further than you did to be here.",
+	"sample_rock": "Composition: nickel-iron, trace iridium. Verdict: asteroid shrapnel. It has travelled further than you have to be here, and it is not saying how.",
 	"scrap_metal": "Composition: hull alloy, YOUR hull alloy. The scanner suggests, dryly, putting it back where it came from.",
 	"fuse": "A fuse. Working. The scanner resents being used as a continuity tester.",
 	"protein_bar": "Analysis: 4% protein, 96% commitment. Edible in the way that decisions are reversible.",

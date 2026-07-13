@@ -1,23 +1,18 @@
 extends CharacterBody2D
-## The scientist. Keyboard (A/D + Space/W) and click-to-move both work; E
-## interacts with the nearest thing in range, clicking a thing walks over
-## and interacts on arrival. A small prompt floats overhead when something
-## is in reach. The body is the contractor's; the hands are new.
+## The scientist. Keyboard only (A/D + Space/W); E interacts with the
+## nearest thing in range, or click the thing itself while in range. The
+## prompt shows on the HUD above the hotbar. The body is the contractor's;
+## the hands are new.
 
 const SPEED = 300.0
 const JUMP_VELOCITY = -400.0
-const ARRIVE_DISTANCE = 12.0
 
 var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 
 @onready var anim: AnimationPlayer = get_node("AnimationPlayer")
 @onready var sprite: AnimatedSprite2D = get_node("AnimatedSprite2D")
 
-var towards: Vector2 = Vector2.ZERO
-var is_auto_moving: bool = false
-var pending_interact: Interactable = null
 var in_range: Array[Interactable] = []
-var prompt_label: Label = null
 var controls_locked: bool = false
 var crawling: bool = false
 
@@ -26,7 +21,11 @@ const CRAWL_SPEED_MULT := 0.4
 func _ready() -> void:
 	add_to_group("player")
 	collision_layer = 2
-	_make_prompt_label()
+	# In front of doors, signs and wall lights; behind nothing that matters.
+	z_index = 15
+	# Spawns land a few pixels above the deck; a generous snap length
+	# swallows the drop so entering a room doesn't look like a hop.
+	floor_snap_length = 16.0
 	GameState.suit_changed.connect(_refresh_helmet_frames)
 	_refresh_helmet_frames()
 
@@ -43,6 +42,10 @@ func set_crawling(on: bool) -> void:
 		cs.position = Vector2(0, -24)
 		sprite.rotation = PI / 2.0 if sprite.flip_h else -PI / 2.0
 		sprite.position = Vector2(0, -26)
+		# Prone means prone: freeze on one frame, no walk cycle, no idle.
+		anim.stop()
+		sprite.stop()
+		sprite.frame = 0
 	else:
 		rect.size = Vector2(62, 120)
 		cs.position = Vector2(0, -55)
@@ -97,10 +100,7 @@ func _physics_process(delta: float) -> void:
 			anim.play("Idle")
 		move_and_slide()
 		return
-	if is_auto_moving:
-		_handle_click_movement()
-	else:
-		_handle_keyboard_movement()
+	_handle_keyboard_movement()
 	_update_prompt()
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -119,48 +119,17 @@ func _handle_keyboard_movement() -> void:
 	var direction := Input.get_axis("move_left", "move_right")
 	var speed := SPEED * (CRAWL_SPEED_MULT if crawling else 1.0)
 	if direction:
-		# Manual steering always overrides a queued walk order.
-		pending_interact = null
 		sprite.flip_h = direction < 0
 		if crawling:
 			sprite.rotation = PI / 2.0 if sprite.flip_h else -PI / 2.0
 		velocity.x = direction * speed
-		if velocity.y == 0:
+		if velocity.y == 0 and not crawling:
 			anim.play("Run")
 	else:
 		velocity.x = move_toward(velocity.x, 0, SPEED)
-		if velocity.y == 0:
+		if velocity.y == 0 and not crawling:
 			anim.play("Idle")
 	move_and_slide()
-
-func _handle_click_movement() -> void:
-	var dif := global_position.direction_to(towards)
-	velocity.x = dif.x * SPEED
-	sprite.flip_h = velocity.x < -0.5
-	anim.play("Run" if absf(velocity.x) > 0.5 else "Idle")
-	move_and_slide()
-	if absf(global_position.x - towards.x) < ARRIVE_DISTANCE:
-		is_auto_moving = false
-		towards = Vector2.ZERO
-		anim.play("Idle")
-		if pending_interact != null and is_instance_valid(pending_interact):
-			var target := pending_interact
-			pending_interact = null
-			target.try_interact(self)
-
-func move_to(g_pos: Vector2) -> void:
-	# A plain walk order cancels any queued interaction.
-	pending_interact = null
-	towards = g_pos
-	is_auto_moving = true
-
-func approach_and_interact(target: Interactable) -> void:
-	if in_range.has(target):
-		target.try_interact(self)
-		return
-	pending_interact = target
-	towards = Vector2(target.global_position.x, global_position.y)
-	is_auto_moving = true
 
 # ------------------------------------------------------------- range + prompt
 
@@ -183,22 +152,11 @@ func notify_range_entered(i: Interactable) -> void:
 func notify_range_exited(i: Interactable) -> void:
 	in_range.erase(i)
 
-func _make_prompt_label() -> void:
-	prompt_label = Label.new()
-	prompt_label.position = Vector2(-60, -110)
-	prompt_label.size = Vector2(120, 24)
-	prompt_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	prompt_label.add_theme_font_size_override("font_size", 18)
-	prompt_label.add_theme_color_override("font_color", Color(0.92, 0.96, 1.0))
-	prompt_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.9))
-	prompt_label.add_theme_constant_override("outline_size", 4)
-	prompt_label.visible = false
-	add_child(prompt_label)
-
 func _update_prompt() -> void:
+	# The prompt lives on the HUD above the hotbar now, not over the
+	# character's head, so it can afford full sentences.
 	var target := _nearest_in_range()
-	if target != null:
-		prompt_label.text = "[E] %s" % target.prompt
-		prompt_label.visible = true
-	else:
-		prompt_label.visible = false
+	Hud.set_prompt("[E]  %s" % target.prompt if target != null else "")
+
+func _exit_tree() -> void:
+	Hud.set_prompt("")

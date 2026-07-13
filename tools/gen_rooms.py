@@ -182,6 +182,13 @@ outline_rect(d, [960, FLOOR_TOP - 104, 1050, FLOOR_TOP - 80], (60, 70, 84))
 outline_rect(d, [1150, INT_TOP + 10, 1740, INT_TOP + 54], DARKMETAL)
 for i, bx in enumerate(range(1170, 1720, 52)):
     d.ellipse([bx, INT_TOP + 22, bx + 18, INT_TOP + 40], fill=AMBER if i % 2 else GREEN, outline=LINE, width=2)
+# AI core rack: a floor-standing server cabinet aft, by the door. One
+# fuse socket sits open and obvious.
+outline_rect(d, [1560, INT_TOP + 70, 1720, FLOOR_TOP], (52, 58, 66))
+for ry in range(INT_TOP + 82, FLOOR_TOP - 18, 22):
+    d.rectangle([1572, ry, 1708, ry + 12], fill=(30, 34, 40), outline=LINE, width=2)
+    d.ellipse([1694, ry + 2, 1702, ry + 10], fill=AMBER)
+d.rectangle([1572, FLOOR_TOP - 34, 1640, FLOOR_TOP - 10], fill=(20, 22, 26), outline=(240, 180, 70), width=3)  # empty fuse socket
 door_recess(d, 1780)
 save(img, "cockpit")
 
@@ -406,7 +413,7 @@ d.ellipse([492, 398, 538, 434], fill=(80, 86, 96), outline=LINE, width=4)
 try:
     from PIL import ImageFont
     fnt = ImageFont.truetype("C:/Windows/Fonts/arialbd.ttf", 40)
-    d.text((580, 136), "CSV REPRIEVE", font=fnt, fill=(90, 96, 106, 255))
+    d.text((490, 300), "CSV REPRIEVE", font=fnt, fill=(90, 96, 106, 255))
 except Exception:
     pass
 ext.save(os.path.join(OUT, "derelict_exterior.png"))
