@@ -81,7 +81,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not _in_world():
 		return
 	if event is InputEventKey and event.pressed and not event.echo and not any_overlay_open():
-		if event.keycode >= KEY_1 and event.keycode <= KEY_6:
+		if event.keycode >= KEY_1 and event.keycode <= KEY_9:
 			_hotbar_key(event.keycode - KEY_1)
 			get_viewport().set_input_as_handled()
 			return
@@ -330,6 +330,11 @@ func _item_action(id: String) -> void:
 					Sd.play(&"eat")
 					toast("Chewy. Historically chewy.")
 					_refresh_inventory()
+				"medkit":
+					GameState.remove_item("medkit")
+					Sd.play(&"suit_equip", -6.0)
+					toast("Antiseptic, analgesic, and a sticker that says BRAVE. You feel patched.")
+					_refresh_inventory()
 				"duct_tape":
 					toast("You feel prepared for approximately everything.")
 				"wrench":
@@ -347,41 +352,42 @@ var hotbar_ids: Array = []
 func _build_hotbar() -> void:
 	hotbar_box = HBoxContainer.new()
 	hotbar_box.add_theme_constant_override("separation", 8)
-	hotbar_box.position = Vector2(688, 1004)
+	hotbar_box.position = Vector2(586, 1004)
 	add_child(hotbar_box)
 	_refresh_hotbar()
 
 func _refresh_hotbar() -> void:
+	# Nine slots, always on screen. GameState.hotbar owns which item lives
+	# where: pickup order, stable, gaps stay gaps. No sorting here.
 	if hotbar_box == null:
 		return
 	for c in hotbar_box.get_children():
 		c.queue_free()
-	hotbar_ids = []
-	var ids: Array = GameState.inventory.keys()
-	ids.sort_custom(func(a, b):
-		var ka := String(Items.get_def(String(a)).get("kind", "material"))
-		var kb := String(Items.get_def(String(b)).get("kind", "material"))
-		var order := {"equip": 0, "use": 1, "read": 2, "key": 3, "material": 4}
-		return int(order.get(ka, 5)) < int(order.get(kb, 5)))
-	for id in ids:
-		if hotbar_ids.size() >= 6:
-			break
-		var kind := String(Items.get_def(String(id)).get("kind", "material"))
-		if kind in ["equip", "use", "read"]:
-			hotbar_ids.append(String(id))
+	hotbar_ids = GameState.hotbar.duplicate()
 	for i in hotbar_ids.size():
+		var id := String(hotbar_ids[i])
 		var slot := PanelContainer.new()
 		var style := StyleBoxFlat.new()
-		style.bg_color = Color(0.07, 0.086, 0.118, 0.85)
-		style.border_color = PANEL_EDGE
+		style.bg_color = Color(0.07, 0.086, 0.118, 0.85 if id != "" else 0.45)
+		style.border_color = PANEL_EDGE if id != "" else Color(PANEL_EDGE, 0.4)
 		style.set_border_width_all(2)
 		style.set_content_margin_all(6)
 		slot.add_theme_stylebox_override("panel", style)
 		slot.custom_minimum_size = Vector2(64, 64)
-		var tex := TextureRect.new()
-		tex.texture = _icon(hotbar_ids[i])
-		tex.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		slot.add_child(tex)
+		if id != "":
+			var tex := TextureRect.new()
+			tex.texture = _icon(id)
+			tex.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			slot.add_child(tex)
+			var n := int(GameState.inventory.get(id, 0))
+			if n > 1:
+				var badge := Label.new()
+				badge.text = "x%d" % n
+				badge.add_theme_font_size_override("font_size", 12)
+				badge.add_theme_color_override("font_color", Color(0.9, 0.93, 0.96))
+				badge.position = Vector2(36, 44)
+				badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
+				slot.add_child(badge)
 		var num := Label.new()
 		num.text = str(i + 1)
 		num.add_theme_font_size_override("font_size", 13)
@@ -389,7 +395,7 @@ func _refresh_hotbar() -> void:
 		num.position = Vector2(4, 2)
 		num.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		slot.add_child(num)
-		if hotbar_ids[i] in ["suit_torso", "suit_helmet"] and GameState.is_equipped(hotbar_ids[i]):
+		if id in ["suit_torso", "suit_helmet"] and GameState.is_equipped(id):
 			var dot := ColorRect.new()
 			dot.color = ACCENT
 			dot.size = Vector2(10, 10)
@@ -399,8 +405,8 @@ func _refresh_hotbar() -> void:
 		hotbar_box.add_child(slot)
 
 func _hotbar_key(index: int) -> void:
-	if index < hotbar_ids.size():
-		_item_action(hotbar_ids[index])
+	if index < hotbar_ids.size() and String(hotbar_ids[index]) != "":
+		_item_action(String(hotbar_ids[index]))
 		Sd.play(&"switch_click", -12.0)
 
 # ------------------------------------------------------------- reader

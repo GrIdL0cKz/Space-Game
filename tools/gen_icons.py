@@ -128,4 +128,20 @@ for name, col in [("manual_airlock", RED), ("mission_brief", BLUE), ("crew_log_m
         d.line([28, ly, 46, ly], fill=DARK, width=2)
     save(img, name)
 
+# medkit
+img, d = icon("medkit")
+rr(d, [8, 18, 56, 50], (235, 238, 242))
+d.rectangle([27, 26, 37, 42], fill=(200, 60, 50))
+d.rectangle([22, 31, 42, 37], fill=(200, 60, 50))
+d.line([8, 18, 56, 18], fill=LINE, width=3)
+save(img, "medkit")
+
+# crew tag from the Reprieve
+img, d = icon("reprieve_tag")
+rr(d, [18, 14, 46, 52], (150, 156, 164))
+d.rectangle([18, 14, 46, 22], fill=(214, 128, 52))
+d.rectangle([24, 28, 40, 40], fill=(90, 96, 106))
+d.line([32, 6, 32, 14], fill=LINE, width=3)
+save(img, "reprieve_tag")
+
 print("done")

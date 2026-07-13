@@ -14,6 +14,9 @@ const STOPS := [
 	["res://scenes/rooms/crew_quarters.tscn", "quarters"],
 	["res://scenes/rooms/eva_outside.tscn", "eva"],
 	["res://scenes/fighter/dogfight.tscn", "dogfight"],
+	["res://scenes/rooms/lander_dock.tscn", "landerdock"],
+	["res://scenes/lander/lander_flight.tscn", "flight"],
+	["res://scenes/rooms/derelict_ship.tscn", "derelict"],
 ]
 
 var idx: int = 0
@@ -24,6 +27,7 @@ func _ready() -> void:
 	GameState.add_item("suit_helmet", 1, true)
 	GameState.add_item("wrench", 1, true)
 	GameState.add_item("manual_airlock", 1, true)
+	GameState.set_flag("solace_online")
 	_next()
 
 func _next() -> void:

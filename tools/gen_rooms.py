@@ -319,4 +319,111 @@ except Exception:
 st.save(os.path.join(OUT, "eva_stern.png"))
 print("stern saved")
 
+# -------------------------------------------------------------- lander dock
+img = Image.new("RGB", (W, H))
+d = ImageDraw.Draw(img)
+tube(d, rnd_seed=13)
+door_recess(d, 60)
+# hazard strip along the deck edge
+for hx in range(0, W, 48):
+    d.polygon([(hx, FLOOR_TOP - 8), (hx + 24, FLOOR_TOP - 8), (hx + 12, FLOOR_TOP)], fill=HAZARD)
+# the lander on its cradle: stubby, boxy, four legs, one round window
+lx, ly = 1150, FLOOR_TOP  # nose points left
+outline_rect(d, [lx - 200, ly - 78, lx + 200, ly - 22], METAL)          # body
+d.polygon([(lx - 200, ly - 78), (lx - 258, ly - 50), (lx - 200, ly - 22)],
+          fill=METAL, outline=LINE)                                      # nose
+outline_rect(d, [lx - 80, ly - 100, lx + 110, ly - 78], DARKMETAL)      # cabin hump
+d.ellipse([lx - 40, ly - 66, lx - 4, ly - 32], fill=SCREEN_BG, outline=LINE, width=3)  # window
+d.rectangle([lx - 190, ly - 56, lx + 190, ly - 48], fill=STRIPE)        # our blue stripe
+for leg in [lx - 150, lx + 60]:
+    d.line([leg, ly - 22, leg - 18, ly], fill=LINE, width=5)
+    d.line([leg + 30, ly - 22, leg + 48, ly], fill=LINE, width=5)
+# dock clamps: two heavy arms from the ceiling band
+for cx in [lx - 120, lx + 96]:
+    outline_rect(d, [cx, INT_TOP + 4, cx + 26, INT_TOP + 56], DARKMETAL)
+    outline_rect(d, [cx - 10, INT_TOP + 56, cx + 36, INT_TOP + 74], DARKMETAL)
+# clamp status box
+outline_rect(d, [340, INT_TOP + 12, 470, INT_TOP + 60], DARKMETAL)
+d.ellipse([355, INT_TOP + 26, 375, INT_TOP + 46], fill=RED, outline=LINE, width=2)
+d.ellipse([390, INT_TOP + 26, 410, INT_TOP + 46], fill=AMBER, outline=LINE, width=2)
+save(img, "lander_dock")
+
+# ------------------------------------------------------------ derelict deck
+DWALL = (96, 104, 116)
+DWALL_SHADE = (82, 90, 102)
+img = Image.new("RGB", (W, H))
+d = ImageDraw.Draw(img)
+tube(d, wall=DWALL, rnd_seed=21)
+# kill the white skin: the Reprieve wears grey and an orange stripe
+d.rectangle([0, INT_TOP - 32, W, INT_TOP], fill=(140, 146, 154))
+d.rectangle([0, INT_TOP - 40, W, INT_TOP - 32], fill=(214, 128, 52))
+d.rectangle([0, FLOOR_BOT, W, FLOOR_BOT + 32], fill=(140, 146, 154))
+d.rectangle([0, FLOOR_BOT + 32, W, FLOOR_BOT + 40], fill=(214, 128, 52))
+d.line([0, INT_TOP, W, INT_TOP], fill=LINE, width=4)
+# hatch recess where the lander clamps on
+outline_rect(d, [60, INT_TOP + 4, 156, FLOOR_TOP], DWALL_SHADE, 3)
+# dead screens
+screen(d, [300, INT_TOP + 14, 520, INT_TOP + 66], "text")
+d.rectangle([306, INT_TOP + 20, 514, INT_TOP + 60], fill=(20, 22, 26))  # dead
+# emergency lamp, the only thing still trying
+d.ellipse([760, INT_TOP + 16, 796, INT_TOP + 52], fill=(120, 30, 24), outline=LINE, width=3)
+for r in range(3):
+    d.arc([760 - r * 26, INT_TOP + 16 - r * 14, 796 + r * 26, INT_TOP + 52 + r * 14],
+          210, 330, fill=(120, 30, 24), width=2)
+# supply locker, door hanging open
+outline_rect(d, [900, INT_TOP + 8, 1030, FLOOR_TOP], DWALL_SHADE)
+d.polygon([(1030, INT_TOP + 8), (1096, INT_TOP + 30), (1096, FLOOR_TOP - 30), (1030, FLOOR_TOP)],
+          fill=DWALL_SHADE, outline=LINE)
+# escape pod bays: two empty rings, launch rails, dust
+for px in [1300, 1520]:
+    d.ellipse([px, INT_TOP + 14, px + 150, FLOOR_TOP - 6], fill=SPACE, outline=LINE, width=5)
+    d.line([px + 20, FLOOR_TOP - 14, px + 130, FLOOR_TOP - 14], fill=(60, 64, 70), width=4)
+# log terminal: one desk, one screen, one chair pushed back forever
+outline_rect(d, [1720, FLOOR_TOP - 60, 1880, FLOOR_TOP], (110, 116, 126))
+screen(d, [1740, FLOOR_TOP - 118, 1860, FLOOR_TOP - 66], "text")
+save(img, "derelict_deck")
+
+# ------------------------------------------------- derelict exterior (RGBA)
+ext = Image.new("RGBA", (900, 560), (0, 0, 0, 0))
+d = ImageDraw.Draw(ext)
+# grey hull tube seen from the side, nose left, orange stripe, battle scars
+d.rounded_rectangle([40, 120, 860, 440], radius=90, fill=(150, 156, 164),
+                    outline=LINE, width=6)
+d.rectangle([40, 180, 860, 214], fill=(214, 128, 52))
+d.rectangle([40, 356, 860, 390], fill=(214, 128, 52))
+for sx in range(140, 860, 150):
+    d.line([sx, 126, sx, 434], fill=(120, 126, 134), width=4)
+# the wound from our stern: a crumpled dark bite out of the nose
+d.polygon([(40, 210), (150, 240), (110, 300), (170, 330), (60, 360)],
+          fill=(52, 56, 64), outline=LINE)
+# dead viewport row
+for wx in range(300, 800, 90):
+    d.ellipse([wx, 250, wx + 40, 290], fill=(24, 26, 32), outline=LINE, width=4)
+# dock hatch, our way in (mid-belly)
+d.ellipse([470, 380, 560, 452], fill=(222, 232, 238), outline=LINE, width=5)
+d.ellipse([492, 398, 538, 434], fill=(80, 86, 96), outline=LINE, width=4)
+# name stencil
+try:
+    from PIL import ImageFont
+    fnt = ImageFont.truetype("C:/Windows/Fonts/arialbd.ttf", 40)
+    d.text((580, 136), "CSV REPRIEVE", font=fnt, fill=(90, 96, 106, 255))
+except Exception:
+    pass
+ext.save(os.path.join(OUT, "derelict_exterior.png"))
+print("wrote derelict_exterior")
+
+# ---------------------------------------------------------- lander (RGBA)
+lnd = Image.new("RGBA", (240, 130), (0, 0, 0, 0))
+d = ImageDraw.Draw(lnd)
+outline_rect(d, [30, 40, 210, 100], METAL)                       # body
+d.polygon([(30, 40), (4, 70), (30, 100)], fill=METAL, outline=LINE)   # nose
+outline_rect(d, [90, 16, 186, 40], DARKMETAL)                    # cabin
+d.ellipse([54, 52, 86, 84], fill=SCREEN_BG, outline=LINE, width=3)    # window
+d.rectangle([34, 64, 206, 74], fill=STRIPE)
+d.line([70, 100, 54, 126], fill=LINE, width=5)
+d.line([170, 100, 186, 126], fill=LINE, width=5)
+d.polygon([(210, 52), (236, 62), (236, 80), (210, 90)], fill=DARKMETAL, outline=LINE)  # engine
+lnd.save(os.path.join(OUT, "lander.png"))
+print("wrote lander")
+
 print("done - all rooms at hull scale")

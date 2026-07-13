@@ -11,7 +11,7 @@ const BEATS := [
 	"The automation was supposed to wake you on arrival, in orbit, to applause from nobody.\n\nThe automation has woken you early.\n\nThat is all you know.",
 ]
 const FADE := 1.2
-const HOLD := 4.2
+const HOLD := 7.5
 
 var beat_index: int = 0
 var label: Label
@@ -43,7 +43,7 @@ func _ready() -> void:
 	label.modulate.a = 0.0
 	add_child(label)
 	var skip := Label.new()
-	skip.text = "any key: next    esc: skip"
+	skip.text = "click or any key: next    esc: skip"
 	skip.position = Vector2(20, 1040)
 	skip.add_theme_font_size_override("font_size", 16)
 	skip.add_theme_color_override("font_color", Color(0.4, 0.46, 0.52))

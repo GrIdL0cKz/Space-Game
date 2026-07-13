@@ -32,12 +32,13 @@ func _place_ship_contents() -> void:
 	_door("Airlock", 1830, DECK_BOTTOM, "res://scenes/rooms/airlock_room.tscn", Vector2(300, 631))
 	_prop_crate(620, DECK_BOTTOM)
 	_spot(Searchable.make("Storage crate", "searched_crate",
-			["wrench", "duct_tape"],
-			"A wrench and a roll of duct tape: the two load-bearing pillars of astronautics."),
+			["wrench", "duct_tape", "fuse"],
+			"A wrench, duct tape, and a spare ceramic fuse: the three load-bearing pillars of astronautics."),
 			Vector2(620, DECK_BOTTOM - 40))
 	# --- Mid deck: living.
 	_door("Viewing Deck", 1560, DECK_MID, "res://scenes/rooms/viewing_deck.tscn", Vector2(220, 631))
 	_door("Crew Quarters", 760, DECK_MID, "res://scenes/rooms/crew_quarters.tscn", Vector2(220, 631))
+	_door("Lander Dock", 960, DECK_MID, "res://scenes/rooms/lander_dock.tscn", Vector2(260, 631))
 	_prop_locker(560, DECK_MID)
 	_spot(Searchable.make("Crew locker", "searched_locker_a",
 			["crew_log_medic", "protein_bar"],
@@ -61,10 +62,13 @@ func _place_ship_contents() -> void:
 		"Bays one and two are dark and cold and occupied. You let them be.",
 		"Your own pod stands open. It has already done its part.",
 	]), Vector2(900, DECK_TOP - 40))
+	_spot(CoolantPanel.new(), Vector2(1010, DECK_TOP - 40))
+	_make_coolant_alarm(1010.0)
 	# --- Crawlspace.
-	_spot(HatchUp.new(), Vector2(140, DECK_TOP - 40))
-	_sign("Crawlspace", 140, DECK_TOP - 110)
-	_spot(HatchDown.new(), Vector2(240, ATTIC_Y))
+	# One ladder spot with a tall reach box: usable standing on deck 3 and
+	# crawling in the attic above it.
+	_spot(Ladder.new(), Vector2(50, 250), Vector2(150, 330))
+	_sign("Crawlspace", 160, DECK_TOP - 110)
 	var wires := WiringBox.new()
 	_spot(wires, Vector2(660, ATTIC_Y), Vector2(240, 140))
 	_make_attic()
@@ -72,11 +76,14 @@ func _place_ship_contents() -> void:
 func _door(label: String, x: float, deck_y: float, target: String, spawn: Vector2,
 		req := "", locked := "") -> void:
 	var floor_top: float = FLOOR_TOPS[deck_y]
+	# z 1 so the hull sprite (z 0) can't cover it, and a steel tint so the
+	# white line-art door reads as a door instead of more wall.
 	var door_sprite := Sprite2D.new()
 	door_sprite.texture = load(DOOR_TEX)
 	door_sprite.position = Vector2(x, floor_top - 60.0)
 	door_sprite.scale = Vector2(0.82, 0.82)
-	door_sprite.z_index = -1
+	door_sprite.modulate = Color(0.62, 0.7, 0.78)
+	door_sprite.z_index = 1
 	add_child(door_sprite)
 	# Deck interiors are only 92px tall; the plate straddles the ceiling
 	# line like a mounted sign instead of vanishing behind the deck above.
@@ -151,7 +158,11 @@ func _prop_box(x: float, deck_y: float, box_size: Vector2, col: Color) -> void:
 func _make_attic() -> void:
 	# Floor for the crawlspace (the art has it; the physics didn't) and a
 	# crawl zone that folds the player over while they're up there.
+	# The floor lives on layer 8: a standing player is taller than the deck
+	# interior, so on the default layer this slab wedged anyone who stood on
+	# deck 3. The ladder toggles the player's mask when they climb.
 	var attic_body := StaticBody2D.new()
+	attic_body.collision_layer = 128
 	var cs := CollisionShape2D.new()
 	var rect := RectangleShape2D.new()
 	rect.size = Vector2(1840, 20)
@@ -170,18 +181,53 @@ func _make_attic() -> void:
 	zone.add_child(zcs)
 	add_child(zone)
 	zone.body_entered.connect(func(b: Node):
-		if b.is_in_group("player") and b.has_method("set_crawling"):
+		# Only fold someone who's actually up here, not a deck-3 jumper
+		# whose head grazes the zone mid-air.
+		if b.is_in_group("player") and b.has_method("set_crawling") and b.is_on_floor():
 			b.set_crawling(true))
 	zone.body_exited.connect(func(b: Node):
 		if b.is_in_group("player") and b.has_method("set_crawling"):
 			b.set_crawling(false))
+
+func _make_coolant_alarm(x: float) -> void:
+	# The shortage, announced the ship's way: a small red light over the
+	# cryo bay, blinking, with a faint alarm that refuses to be forgotten.
+	var light := ColorRect.new()
+	light.color = Color(0.85, 0.15, 0.1)
+	light.size = Vector2(14, 10)
+	light.position = Vector2(x - 7, DECK_TOP - 96.0)
+	light.z_index = 5
+	add_child(light)
+	var tw := create_tween().set_loops()
+	tw.tween_property(light, "modulate:a", 0.15, 0.9)
+	tw.tween_interval(0.4)
+	tw.tween_property(light, "modulate:a", 1.0, 0.25)
+	tw.tween_interval(1.6)
+	var chirp := Timer.new()
+	chirp.wait_time = 16.0
+	chirp.autostart = true
+	add_child(chirp)
+	chirp.timeout.connect(func():
+		Sd.play(&"alarm_short", -22.0))
+
+class CoolantPanel extends Interactable:
+	func _init() -> void:
+		prompt = "Coolant status panel"
+	func _interact(_player: Node) -> void:
+		if bool(GameState.get_flag("solace_online")):
+			Hud.computer_say("Embryo bay coolant: 61 percent and leaking politely. There is a depot moon on our route with reserves. When we are moving again, we stop there. I have already written it in the diary.")
+		else:
+			Hud.toast("COOLANT RESERVE: 61%. TREND: DOWN. A red light blinks above the panel, unhurried and certain.")
 
 func _first_waking_beat() -> void:
 	if bool(GameState.get_flag("woke_up")):
 		return
 	GameState.set_flag("woke_up")
 	Hud.toast("Cryo pod 4: cycle complete. Duration: rather longer than advertised.")
-	Hud.computer_say("Occupant of pod four: welcome back. Please remain calm. Several things require your attention, in an order I am still prioritising.")
+	# The ship's mind is down. What answers is the watchdog: a smoke
+	# detector with a vocabulary. Restoring SOLACE is the first job.
+	Hud.computer_say("AUTONOMIC WATCHDOG ONLINE. PRIMARY INTELLIGENCE: OFFLINE. CAUSE: CORE FUSE FAILURE.")
+	Hud.computer_say("RESTORE SEQUENCE: SPARE FUSE - STORES CRATE, THIS DECK. CORE RACK - COCKPIT, DECK 3. END OF ASSISTANCE.")
 
 func _unhandled_input(event: InputEvent) -> void:
 	if Hud.any_overlay_open():
@@ -198,21 +244,26 @@ func on_elevator_floor_selected(floor_number: int) -> void:
 			$Player.global_position.y += 64
 			break
 
-class HatchUp extends Interactable:
+class Ladder extends Interactable:
+	## Rob's drawn ladder at the port end of deck 3: the one way up into the
+	## crawlspace and the one way back down. Climbing up folds the player
+	## prone and lets them collide with the attic floor; climbing down
+	## stands them up and releases it.
 	func _init() -> void:
-		prompt = "Climb into the crawlspace"
+		prompt = "Ladder"
 	func _interact(player: Node) -> void:
 		Sd.play(&"door_slide", -6.0)
-		player.global_position.y = 160.0
-
-class HatchDown extends Interactable:
-	func _init() -> void:
-		prompt = "Drop down"
-	func _interact(player: Node) -> void:
-		Sd.play(&"door_slide", -6.0)
-		if player.has_method("set_crawling"):
-			player.set_crawling(false)
-		player.global_position.y = 331.0
+		if player.global_position.y > 290.0:
+			player.collision_mask |= 128
+			player.global_position = Vector2(70.0, 218.0)
+			if player.has_method("set_crawling"):
+				player.set_crawling(true)
+			Hud.toast("You fold yourself into the crawlspace. The wiring looks pleased to see you.")
+		else:
+			if player.has_method("set_crawling"):
+				player.set_crawling(false)
+			player.collision_mask &= ~128
+			player.global_position = Vector2(70.0, 331.0)
 
 class WiringBox extends Interactable:
 	func _init() -> void:

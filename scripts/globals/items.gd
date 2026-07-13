@@ -60,6 +60,16 @@ const DB := {
 		"kind": "use",
 		"desc": "Best before: two hundred and seventy-one years ago. The wrapper says 'NOW TASTIER'. Than what, it does not say.",
 	},
+	"medkit": {
+		"name": "Field Medkit",
+		"kind": "use",
+		"desc": "Sealed, dated, and stocked by somebody who expected to come back for it. The seal breaks like a promise.",
+	},
+	"reprieve_tag": {
+		"name": "Crew Tag: CSV REPRIEVE",
+		"kind": "material",
+		"desc": "A crew identity tag from a ship called REPRIEVE. The lanyard is snapped. The photo is of nobody you know, which is somehow worse.",
+	},
 	"manual_airlock": {
 		"name": "Airlock Operations Manual",
 		"kind": "read",

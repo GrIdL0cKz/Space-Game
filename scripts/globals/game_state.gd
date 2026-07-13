@@ -17,6 +17,9 @@ var equipped: Dictionary = {"suit_torso": false, "suit_helmet": false}
 var flags: Dictionary = {}
 var deaths: int = 0
 var playtime: float = 0.0
+# Nine hotbar slots. An item claims the first empty slot when picked up and
+# keeps it until the last one is used; slots never reshuffle.
+var hotbar: Array = ["", "", "", "", "", "", "", "", ""]
 
 func _process(delta: float) -> void:
 	playtime += delta
@@ -25,6 +28,10 @@ func _process(delta: float) -> void:
 
 func add_item(id: String, count: int = 1, quiet: bool = false) -> void:
 	inventory[id] = int(inventory.get(id, 0)) + count
+	if not hotbar.has(id):
+		var free := hotbar.find("")
+		if free != -1:
+			hotbar[free] = id
 	inventory_changed.emit()
 	if not quiet:
 		Hud.toast("Picked up: %s" % Items.display_name(id))
@@ -36,6 +43,9 @@ func remove_item(id: String, count: int = 1) -> bool:
 	inventory[id] = int(inventory[id]) - count
 	if int(inventory[id]) <= 0:
 		inventory.erase(id)
+		var slot := hotbar.find(id)
+		if slot != -1:
+			hotbar[slot] = ""
 	inventory_changed.emit()
 	return true
 
@@ -73,6 +83,7 @@ func snapshot() -> Dictionary:
 		"flags": flags.duplicate(),
 		"deaths": deaths,
 		"playtime": playtime,
+		"hotbar": hotbar.duplicate(),
 	}
 
 func restore(data: Dictionary) -> void:
@@ -81,6 +92,14 @@ func restore(data: Dictionary) -> void:
 	flags = data.get("flags", {}).duplicate()
 	deaths = int(data.get("deaths", 0))
 	playtime = float(data.get("playtime", 0.0))
+	hotbar = data.get("hotbar", ["", "", "", "", "", "", "", "", ""]).duplicate()
+	# Older saves predate the hotbar: seed it from what's carried.
+	if hotbar.count("") == hotbar.size():
+		for id in inventory:
+			var free := hotbar.find("")
+			if free == -1:
+				break
+			hotbar[free] = String(id)
 	inventory_changed.emit()
 	flags_changed.emit()
 	suit_changed.emit()

@@ -73,12 +73,16 @@ func _refresh_helmet_frames() -> void:
 				if ResourceLoader.exists(path):
 					walks.append(load(path))
 			if walks.size() == 4:
-				for anim in ["Run", "Idle"]:
+				# No no-helm jump art exists, so Jump borrows a mid-stride
+				# walk frame - otherwise the helmet pops back on every hop.
+				for anim in ["Run", "Idle", "Jump", "RunFree"]:
 					if off.has_animation(anim):
 						off.clear(anim)
-						if anim == "Run":
+						if anim == "Run" or anim == "RunFree":
 							for t in walks:
 								off.add_frame(anim, t)
+						elif anim == "Jump":
+							off.add_frame(anim, walks[1])
 						else:
 							off.add_frame(anim, walks[0])
 			_helm_frames_cached["off"] = off

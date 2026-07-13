@@ -77,10 +77,13 @@ func add_spot(inst: Interactable, x: float, reach := Vector2(150, 170)) -> Inter
 ## A visible door (Rob's art) + an overhead sign, wrapping a Doorway spot.
 func add_door(label: String, x: float, target: String, spawn: Vector2,
 		req_item := "", locked_line := "") -> void:
+	# Steel tint: the door art is white line-work and vanishes against the
+	# pale interior walls without it.
 	var door_sprite := Sprite2D.new()
 	door_sprite.texture = load(DOOR_TEX)
 	door_sprite.position = Vector2(x, FLOOR_TOP - 64.0)
 	door_sprite.scale = Vector2(0.8, 0.8)
+	door_sprite.modulate = Color(0.62, 0.7, 0.78)
 	door_sprite.z_index = -5
 	add_child(door_sprite)
 	add_sign(label, x)

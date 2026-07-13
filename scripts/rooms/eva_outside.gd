@@ -7,9 +7,16 @@ extends Node2D
 const WORLD_W := 4200.0
 const DRIFT_THRUST := 240.0
 const MAX_SPEED := 460.0
+# The tether pays out to just past the farthest salvage; beyond that it
+# goes taut and hauls you back like the safety line it is.
+const TETHER_ANCHOR := Vector2(262, 535)
+const TETHER_MAX := 3850.0
 
 var player: CharacterBody2D
 var camera: Camera2D
+var player_sprite: AnimatedSprite2D
+var tether: Line2D
+var drift_time: float = 0.0
 
 func _ready() -> void:
 	add_to_group("world")
@@ -56,6 +63,24 @@ func _build_player() -> void:
 	player.global_position = pending if pending is Vector2 else Vector2(430, 530)
 	add_child(player)
 	player.set_physics_process(false)
+	# Frozen mid-jump pose + a slow sway: an astronaut adrift, not a
+	# commuter standing at a bus stop in hard vacuum.
+	player_sprite = player.get_node("AnimatedSprite2D")
+	player_sprite.animation = &"Jump"
+	player_sprite.frame = 1
+	player_sprite.pause()
+	# The safety line, clipped to the hatch.
+	tether = Line2D.new()
+	tether.width = 3.0
+	tether.default_color = Color(0.85, 0.89, 0.93, 0.75)
+	tether.z_index = -2
+	add_child(tether)
+	var clip := ColorRect.new()
+	clip.color = Color(0.85, 0.89, 0.93)
+	clip.size = Vector2(10, 10)
+	clip.position = TETHER_ANCHOR - Vector2(5, 5)
+	clip.z_index = -2
+	add_child(clip)
 	camera = Camera2D.new()
 	camera.zoom = Vector2.ONE * 1.4
 	camera.position_smoothing_enabled = true
@@ -77,11 +102,43 @@ func _physics_process(delta: float) -> void:
 		input.y += 1.0
 	if input != Vector2.ZERO:
 		player.velocity += input.normalized() * DRIFT_THRUST * delta
+	# Past full payout the tether goes taut and pulls back, hard with the
+	# overshoot - a spring, not a wall.
+	var to_anchor := TETHER_ANCHOR - player.global_position
+	var overshoot := to_anchor.length() - TETHER_MAX
+	if overshoot > 0.0:
+		player.velocity += to_anchor.normalized() * overshoot * 6.0 * delta
 	player.velocity = player.velocity.limit_length(MAX_SPEED)
 	player.move_and_slide()
 	player.global_position.y = clampf(player.global_position.y, 60, 1020)
 	player.global_position.x = clampf(player.global_position.x, 250, WORLD_W - 60)
 	player._update_prompt()
+	_update_drift_pose(delta)
+	_update_tether()
+
+func _update_drift_pose(delta: float) -> void:
+	drift_time += delta
+	if player_sprite == null:
+		return
+	if absf(player.velocity.x) > 12.0:
+		player_sprite.flip_h = player.velocity.x < 0.0
+	player_sprite.rotation = sin(drift_time * 0.9) * 0.1 \
+			+ clampf(player.velocity.x * 0.0004, -0.18, 0.18)
+
+func _update_tether() -> void:
+	# A slack line sags; a taut line is a straight, worried thing.
+	var a := TETHER_ANCHOR
+	var b := player.global_position + Vector2(0, -60)
+	var dist := a.distance_to(b)
+	var slack := clampf(1.0 - dist / TETHER_MAX, 0.0, 1.0)
+	var sag := 30.0 + slack * 220.0
+	var pts := PackedVector2Array()
+	for i in 25:
+		var t := i / 24.0
+		var p := a.lerp(b, t)
+		p.y += sin(t * PI) * sag
+		pts.append(p)
+	tether.points = pts
 
 func _build_salvage() -> void:
 	var spots := [

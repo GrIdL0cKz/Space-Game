@@ -67,6 +67,26 @@ I have moved what I can to bays 1 and 2 and written up full notes for whoever wa
 The eggs are fine. Keep them that way.",
 		],
 	},
+	"reprieve_captains_log": {
+		"title": "CAPTAIN'S LOG - CSV REPRIEVE (RECOVERED)",
+		"pages": [
+			"D4,012
+
+Eleven years of looking and there she is on the long scope, right where the projections said she had no business being. Target confirmed. I bought the ship's company a round of the good ration syrup. Approach begins tomorrow, dawn cycle.",
+			"D4,013
+
+I will write this plainly because someone will read it someday and deserve plainness.
+
+We came in shedding velocity and her automation flinched - hard avoidance burn, no hail, no handshake. We clipped her stern. Their strike shed debris; our drives took it worse. Reprieve is dead in the water. So, apparently, is her bow watch. She never even woke up.",
+			"D4,201
+
+Six months of repairs that did not repair. The pods leave tomorrow - coordinates home are thirty years stale, but the pods know the way better than the ship does now.
+
+We are leaving the lights on for her. Orders were orders, and I will not write them here where she might someday read them and feel about it the way I do.
+
+- Cpt. A. Reyes, CSV Reprieve",
+		],
+	},
 	"note_galley": {
 		"title": "NOTE, TAPED TO THE GALLEY WALL",
 		"pages": [
