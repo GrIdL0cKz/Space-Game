@@ -5,6 +5,7 @@ extends Node
 const STOPS := [
 	["res://scenes/main.tscn", "menu"],
 	["res://scenes/intro.tscn", "intro"],
+	["res://scenes/rooms/cryo_bay.tscn", "cryobay"],
 	["res://scenes/craft_world.tscn", "ship"],
 	["res://scenes/rooms/science_lab.tscn", "lab"],
 	["res://scenes/rooms/viewing_deck.tscn", "viewing"],

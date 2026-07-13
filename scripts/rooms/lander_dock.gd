@@ -17,7 +17,6 @@ func _ready() -> void:
 
 func _populate() -> void:
 	add_door("Corridor", 110, "res://scenes/craft_world.tscn", Vector2(1250, 488))
-	add_sign("Lander Dock", 1150)
 	add_spot(LanderSeat.new(), 1150, Vector2(420, 200))
 	add_spot(FlavourSpot.make("Clamp status box", [
 		"One red light, one amber. In dock-clamp language this means 'ask the computer'.",

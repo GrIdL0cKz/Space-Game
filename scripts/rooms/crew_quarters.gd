@@ -9,7 +9,6 @@ func _init() -> void:
 
 func _populate() -> void:
 	add_door("Corridor", 110, "res://scenes/craft_world.tscn", Vector2(760, 488))
-	add_sign("Crew Quarters", 620)
 	add_spot(FlavourSpot.make("Your bunk", [
 		"Slept in once, three hundred years ago, technically by you.",
 		"You could sleep. You should sleep. You check one more system instead.",

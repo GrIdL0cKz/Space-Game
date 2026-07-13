@@ -120,7 +120,7 @@ d.line([44, 22, 44, 42], fill=LINE, width=2)
 save(img, "protein_bar")
 
 # manuals / readables
-for name, col in [("manual_airlock", RED), ("mission_brief", BLUE), ("crew_log_medic", GREEN)]:
+for name, col in [("manual_airlock", RED), ("mission_brief", BLUE), ("crew_log_medic", GREEN), ("osei_note", (240, 180, 70))]:
     img, d = icon(name)
     rr(d, [12, 8, 52, 56], PAPER)
     d.rectangle([12, 8, 22, 56], fill=col, outline=LINE, width=3)

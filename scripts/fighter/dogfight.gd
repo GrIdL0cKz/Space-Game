@@ -5,10 +5,10 @@ extends Node2D
 ## through and the fighter - and you - stop being distinct objects.
 ## Clearing the wave flags debris_cleared and flies you home.
 
-const WAVE_SIZE := 10
+const WAVE_SIZE := 14
 const HULL_MAX := 3
-const APPROACH_TIME := 7.0
-const SPAWN_EVERY := 1.7
+const APPROACH_TIME := 5.2
+const SPAWN_EVERY := 1.15
 
 var crosshair := Vector2(960, 500)
 var targets: Array = []
@@ -37,9 +37,13 @@ func _process(delta: float) -> void:
 	spawn_timer -= delta
 	if spawn_timer <= 0.0 and spawned < WAVE_SIZE:
 		_spawn_target()
+		# The back half of the wave comes in pairs.
+		if spawned >= 6 and spawned < WAVE_SIZE:
+			_spawn_target()
 		spawn_timer = SPAWN_EVERY
 	for t in targets:
 		t["p"] += delta / APPROACH_TIME
+		t["pos"] += t["vel"] * delta
 	# impacts
 	for t in targets.duplicate():
 		if t["p"] >= 1.0:
@@ -59,6 +63,7 @@ func _spawn_target() -> void:
 		"pos": Vector2(randf_range(300, 1620), randf_range(160, 700)),
 		"p": 0.0,
 		"seed": randi() % 1000,
+		"vel": Vector2(randf_range(-46, 46), randf_range(-26, 26)),
 	})
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -68,7 +73,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		Sd.play(&"switch_click", -4.0, 1.6)
 		for t in targets.duplicate():
 			var r: float = 10.0 + t["p"] * 70.0
-			if crosshair.distance_to(t["pos"]) <= r + 12.0:
+			if crosshair.distance_to(t["pos"]) <= r + 5.0:
 				targets.erase(t)
 				destroyed += 1
 				Sd.play(&"airlock_clunk", -8.0, 1.5)

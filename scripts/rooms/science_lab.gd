@@ -9,7 +9,6 @@ func _init() -> void:
 
 func _populate() -> void:
 	add_door("Corridor", 110, "res://scenes/craft_world.tscn", Vector2(1500, 655))
-	add_sign("Science Lab", 590)
 	var scanner := ScannerConsole.new()
 	add_spot(scanner, 590, Vector2(360, 170))
 	add_spot(Searchable.make("Search the shelf", "searched_lab_shelf",

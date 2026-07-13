@@ -32,6 +32,8 @@ func _on_click(_viewport: Node, event: InputEvent, _shape: int) -> void:
 			and event.button_index == MOUSE_BUTTON_LEFT
 	if not (tapped or clicked):
 		return
+	if Hud.computer_active():
+		return
 	var player := get_tree().get_first_node_in_group("player")
 	if player != null and "in_range" in player and player.in_range.has(self):
 		try_interact(player)

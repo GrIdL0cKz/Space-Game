@@ -235,6 +235,86 @@ class CoursePlot extends Control:
 		if hold > 0.0:
 			draw_rect(Rect2(10, size.y - 22, (size.x - 20) * (hold / 2.5), 10), Minigames.GOOD)
 
+# ============================================================ 3b. DOCKING
+# Three clamps, one oscillating alignment marker each. Click (or SPACE)
+# inside the green window to seat a clamp; each one swings faster and the
+# window narrows. Miss once and the Reprieve shrugs you off.
+
+static func open_docking(on_result: Callable) -> void:
+	var ui := _shell("DOCKING CLAMPS - MANUAL SEAT", Vector2(760, 480))
+	var v: VBoxContainer = ui["v"]
+	v.add_child(_label("Three clamps. Catch the marker inside the window - each clamp swings faster than the last. Miss one and you bounce.", 20, DIM))
+	var bar := DockBar.new()
+	bar.custom_minimum_size = Vector2(680, 220)
+	v.add_child(bar)
+	bar.finished.connect(func(ok: bool):
+		Hud.close_modal()
+		on_result.call(ok))
+	v.add_child(_button("Wave off", func():
+		Hud.close_modal()
+		on_result.call(false)))
+	Hud.open_modal(ui["root"])
+
+class DockBar extends Control:
+	signal finished(ok: bool)
+	var clamp_idx := 0
+	var pos := 0.0
+	var dir := 1.0
+	const SPEEDS := [0.85, 1.25, 1.7]
+	const WINDOWS := [0.11, 0.085, 0.065]
+
+	func _process(delta: float) -> void:
+		pos += dir * SPEEDS[clamp_idx] * delta
+		if pos > 1.0:
+			pos = 1.0
+			dir = -1.0
+		elif pos < 0.0:
+			pos = 0.0
+			dir = 1.0
+		queue_redraw()
+
+	func _gui_input(event: InputEvent) -> void:
+		var clicked: bool = event is InputEventMouseButton and event.pressed \
+				and event.button_index == MOUSE_BUTTON_LEFT
+		var keyed: bool = event is InputEventKey and event.pressed and not event.echo \
+				and event.keycode == KEY_SPACE
+		if not (clicked or keyed):
+			return
+		if absf(pos - 0.5) <= WINDOWS[clamp_idx]:
+			Sd.play(&"breaker_thunk", -4.0)
+			clamp_idx += 1
+			if clamp_idx >= 3:
+				set_process(false)
+				finished.emit(true)
+		else:
+			Sd.play(&"switch_click", -6.0, 0.5)
+			set_process(false)
+			finished.emit(false)
+
+	func _ready() -> void:
+		focus_mode = Control.FOCUS_ALL
+		grab_focus.call_deferred()
+
+	func _draw() -> void:
+		draw_rect(Rect2(Vector2.ZERO, size), Color(0.05, 0.07, 0.1))
+		for i in 3:
+			var y := 30.0 + i * 64.0
+			var seated := i < clamp_idx
+			var active := i == clamp_idx
+			draw_string(ThemeDB.fallback_font, Vector2(12, y + 14), "CLAMP %d" % (i + 1),
+					HORIZONTAL_ALIGNMENT_LEFT, -1, 18,
+					Minigames.GOOD if seated else (Minigames.ACCENT if active else Minigames.DIM))
+			var track := Rect2(130, y, size.x - 160, 22)
+			draw_rect(track, Color(0.1, 0.13, 0.17))
+			var w: float = WINDOWS[i] * track.size.x * 2.0
+			draw_rect(Rect2(track.position.x + track.size.x / 2.0 - w / 2.0, y, w, 22),
+					Color(0.3, 0.55, 0.35) if not seated else Minigames.GOOD)
+			if seated:
+				continue
+			if active:
+				var mx: float = track.position.x + pos * track.size.x
+				draw_line(Vector2(mx, y - 6), Vector2(mx, y + 28), Minigames.ACCENT, 3.0)
+
 # ==================================================== 4. AIRLOCK SEQUENCE
 # Four controls, one correct order, taught by the manual. A wrong order is
 # not a fail state; it is a death state. The checkpoint was written before

@@ -70,6 +70,12 @@ const DB := {
 		"kind": "material",
 		"desc": "A crew identity tag from a ship called REPRIEVE. The lanyard is snapped. The photo is of nobody you know, which is somehow worse.",
 	},
+	"osei_note": {
+		"name": "Note: To Whoever Wakes",
+		"kind": "read",
+		"text_id": "osei_note",
+		"desc": "An envelope from R. Osei, Systems. Taped where a cryo pod used to be, addressed to a person the diagnostics said did not exist.",
+	},
 	"manual_airlock": {
 		"name": "Airlock Operations Manual",
 		"kind": "read",

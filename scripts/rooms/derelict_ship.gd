@@ -20,10 +20,9 @@ func _ready() -> void:
 
 func _populate() -> void:
 	add_spot(CastOff.new(), 110, Vector2(160, 200))
-	add_sign("CSV REPRIEVE", 620)
 	add_spot(Searchable.make("Spares bin", "reprieve_spares",
 			["power_cell", "wire_coil"],
-			"Their spares became your spares. Two years is long enough for salvage to stop being stealing."),
+			"Their spares became your spares. Wherever the crew went, they were not coming back for the fuses."),
 			620)
 	add_spot(FlavourSpot.make("Emergency lamp", [
 		"Still burning. However long it has been, it is still trying, and you find you respect it.",

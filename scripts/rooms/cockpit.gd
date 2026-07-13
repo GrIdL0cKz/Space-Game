@@ -8,7 +8,6 @@ func _init() -> void:
 
 func _populate() -> void:
 	add_door("Corridor", 1828, "res://scenes/craft_world.tscn", Vector2(260, 331))
-	add_sign("Cockpit", 620)
 	var nav := NavConsole.new()
 	add_spot(nav, 615, Vector2(560, 170))
 	add_spot(AICore.new(), 1640, Vector2(220, 170))

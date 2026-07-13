@@ -83,7 +83,8 @@ func _advance_now() -> void:
 	out.tween_callback(_next_beat)
 
 func _finish() -> void:
-	get_tree().change_scene_to_file("res://scenes/craft_world.tscn")
+	# The game opens in the cryo bay: your pod, the dead ones, the gap.
+	get_tree().change_scene_to_file("res://scenes/rooms/cryo_bay.tscn")
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed:

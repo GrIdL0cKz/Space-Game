@@ -17,6 +17,7 @@ var camera: Camera2D
 var player_sprite: AnimatedSprite2D
 var tether: Line2D
 var drift_time: float = 0.0
+var _tether_warned: bool = false
 
 func _ready() -> void:
 	add_to_group("world")
@@ -64,7 +65,9 @@ func _build_player() -> void:
 	add_child(player)
 	player.set_physics_process(false)
 	# Frozen mid-jump pose + a slow sway: an astronaut adrift, not a
-	# commuter standing at a bus stop in hard vacuum.
+	# commuter standing at a bus stop in hard vacuum. The AnimationPlayer
+	# must be stopped too - left running, it keeps restarting Idle.
+	(player.get_node("AnimationPlayer") as AnimationPlayer).stop()
 	player_sprite = player.get_node("AnimatedSprite2D")
 	player_sprite.animation = &"Jump"
 	player_sprite.frame = 1
@@ -103,10 +106,18 @@ func _physics_process(delta: float) -> void:
 	if input != Vector2.ZERO:
 		player.velocity += input.normalized() * DRIFT_THRUST * delta
 	# Past full payout the tether goes taut and pulls back, hard with the
-	# overshoot - a spring, not a wall.
+	# overshoot - a spring, not a wall. Hit the end at full burn and the
+	# spring wins in the worst available way.
 	var to_anchor := TETHER_ANCHOR - player.global_position
 	var overshoot := to_anchor.length() - TETHER_MAX
 	if overshoot > 0.0:
+		if player.velocity.length() > 430.0:
+			Death.die("CRACKED THE WHIP",
+				"You reached the end of the tether at full burn. The line held. Your trajectory, your lunch and several vertebrae did not. The suit's last log entry is just the word 'wheee'.")
+			return
+		if not _tether_warned and player.velocity.length() > 300.0:
+			_tether_warned = true
+			Hud.toast("The tether snaps taut and hauls you back. Somewhere in the suit, a strain gauge writes a strongly worded report.")
 		player.velocity += to_anchor.normalized() * overshoot * 6.0 * delta
 	player.velocity = player.velocity.limit_length(MAX_SPEED)
 	player.move_and_slide()
@@ -196,9 +207,9 @@ class SalvagePickup extends Interactable:
 
 class ReturnDoor extends Interactable:
 	func _interact(_player: Node) -> void:
-		GameState.set_flag("airlock_cycled", false)
+		# The chamber stays at vacuum (airlock_cycled remains set): getting
+		# back inside means running the pressure console, every time.
 		SaveManager._pending_pos = [1650.0, 631.0]
 		get_tree().change_scene_to_file.call_deferred("res://scenes/rooms/airlock_room.tscn")
 		Sd.set_eva_silence(false)
-		Sd.play(&"airlock_hiss")
 		Sd.play(&"airlock_clunk", -4.0)

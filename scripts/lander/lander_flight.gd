@@ -97,11 +97,22 @@ func _check_docks() -> void:
 			Death.die("UNSCHEDULED BOARDING",
 				"You docked with the derelict at ramming speed. Technically you are now aboard. Practically, so is the lander's nose cone, and so are you, in a wider sense than before.")
 			return
+		# Slow enough: kill relative drift and seat the clamps by hand.
+		velocity = Vector2.ZERO
 		done = true
-		GameState.set_flag("visited_derelict")
-		Sd.play(&"airlock_clunk")
-		SaveManager._pending_pos = [180.0, 631.0]
-		get_tree().change_scene_to_file.call_deferred("res://scenes/rooms/derelict_ship.tscn")
+		Minigames.open_docking(func(ok: bool):
+			done = false
+			if ok:
+				done = true
+				GameState.set_flag("visited_derelict")
+				Sd.play(&"airlock_clunk")
+				SaveManager._pending_pos = [180.0, 631.0]
+				get_tree().change_scene_to_file.call_deferred("res://scenes/rooms/derelict_ship.tscn")
+			else:
+				# The Reprieve shrugs you off: pushed clear, try again.
+				velocity = (lander.position - hatch).normalized() * 240.0
+				dock_grace = 1.4
+				Hud.toast("The clamps miss their seats and the hulls part ways. Come around and try again, slower in the soul."))
 		return
 	# Home again: anywhere along the Perennial's stern counts.
 	if lander.position.x < 520.0 and velocity.length() < DOCK_SPEED and \

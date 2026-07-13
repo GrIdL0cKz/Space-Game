@@ -433,4 +433,48 @@ d.polygon([(210, 52), (236, 62), (236, 80), (210, 90)], fill=DARKMETAL, outline=
 lnd.save(os.path.join(OUT, "lander.png"))
 print("wrote lander")
 
+# ---------------------------------------------------------------- cryo bay
+# Six pods: yours (open), two dead, two still sleeping, one MISSING -
+# unbolted, cables left hanging, a dust outline where it stood.
+img = Image.new("RGB", (W, H))
+d = ImageDraw.Draw(img)
+tube(d, rnd_seed=41)
+door_recess(d, 60)
+
+def pod(x, state):
+    if state == "missing":
+        # dust shadow + sheared bolts + hanging umbilicals
+        d.rectangle([x + 8, FLOOR_TOP - 6, x + 122, FLOOR_TOP], fill=(178, 178, 178))
+        for bx in [x + 18, x + 58, x + 98]:
+            d.ellipse([bx, FLOOR_TOP - 10, bx + 8, FLOOR_TOP - 2], fill=(90, 96, 104), outline=LINE, width=2)
+        d.line([x + 30, INT_TOP + 10, x + 44, INT_TOP + 52], fill=LINE, width=4)
+        d.line([x + 80, INT_TOP + 10, x + 72, INT_TOP + 40], fill=LINE, width=4)
+        d.ellipse([x + 40, INT_TOP + 48, x + 50, INT_TOP + 58], fill=AMBER, outline=LINE, width=2)
+        return
+    body = (196, 210, 220) if state in ("open", "sleep") else (128, 136, 146)
+    d.rounded_rectangle([x, INT_TOP + 12, x + 130, FLOOR_TOP], radius=26, fill=body, outline=LINE, width=4)
+    if state == "open":
+        # lid swung aside, dark interior
+        d.rounded_rectangle([x + 14, INT_TOP + 24, x + 116, FLOOR_TOP - 8], radius=18, fill=(38, 44, 52), outline=LINE, width=3)
+        d.polygon([(x + 116, INT_TOP + 20), (x + 158, INT_TOP + 34), (x + 158, FLOOR_TOP - 20), (x + 116, FLOOR_TOP - 6)],
+                  fill=(206, 220, 230), outline=LINE)
+    else:
+        d.ellipse([x + 34, INT_TOP + 26, x + 96, INT_TOP + 62], fill=SCREEN_BG, outline=LINE, width=3)
+        lamp = GREEN if state == "sleep" else (120, 30, 24)
+        d.ellipse([x + 56, FLOOR_TOP - 26, x + 74, FLOOR_TOP - 12], fill=lamp, outline=LINE, width=2)
+        if state == "dead":
+            d.line([x + 40, INT_TOP + 30, x + 90, INT_TOP + 58], fill=(60, 64, 70), width=4)
+
+pod(260, "open")     # yours
+pod(460, "dead")
+pod(660, "dead")
+pod(860, "sleep")
+pod(1060, "sleep")
+pod(1300, "missing")
+# diagnostics panel
+outline_rect(d, [1560, INT_TOP + 14, 1860, INT_TOP + 66], DARKMETAL)
+screen(d, [1572, INT_TOP + 20, 1848, INT_TOP + 60], "text")
+outline_rect(d, [1600, FLOOR_TOP - 64, 1820, FLOOR_TOP], METAL)
+save(img, "cryo_bay")
+
 print("done - all rooms at hull scale")

@@ -5,7 +5,6 @@ extends CharacterBody2D
 ## the hands are new.
 
 const SPEED = 300.0
-const JUMP_VELOCITY = -400.0
 
 var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 
@@ -59,9 +58,9 @@ var _helm_frames_cached := {}
 func _refresh_helmet_frames() -> void:
 	if sprite == null:
 		return
-	var helm_on := GameState.is_equipped("suit_helmet") or not GameState.has_item("suit_helmet")
-	# Default frames in the scene ARE the helmet-on set; only override when
-	# the helmet is demonstrably off.
+	# Bare-headed unless the helmet is actually worn: you wake from cryo
+	# without it, and it only appears when you seal it on.
+	var helm_on := GameState.is_equipped("suit_helmet")
 	if helm_on:
 		if _helm_frames_cached.has("on"):
 			sprite.sprite_frames = _helm_frames_cached["on"]
@@ -106,6 +105,9 @@ func _physics_process(delta: float) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if controls_locked:
 		return
+	# While the computer is talking, E belongs to its pages, not the world.
+	if Hud.computer_active():
+		return
 	if event.is_action_pressed("interact"):
 		var target := _nearest_in_range()
 		if target != null:
@@ -113,11 +115,11 @@ func _unhandled_input(event: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 
 func _handle_keyboard_movement() -> void:
-	if Input.is_action_just_pressed("jump") and is_on_floor() and not crawling:
-		velocity.y = JUMP_VELOCITY
-		anim.play("Jump")
+	# No jumping aboard ship: decks are 92px tall and heads are precious.
 	var direction := Input.get_axis("move_left", "move_right")
 	var speed := SPEED * (CRAWL_SPEED_MULT if crawling else 1.0)
+	if int(GameState.get_flag("cryosick", 0)) > 0:
+		speed *= 0.8
 	if direction:
 		sprite.flip_h = direction < 0
 		if crawling:

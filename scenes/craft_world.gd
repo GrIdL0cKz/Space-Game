@@ -15,14 +15,40 @@ const ATTIC_Y := 160.0
 # Floor-band tops per deck (art rows), for placing door sprites.
 const FLOOR_TOPS := {655.0: 644.0, 488.0: 478.0, 331.0: 323.0}
 
+var _sky_sprites: Array = []
+
 func _ready() -> void:
 	add_to_group("world")
 	ManagerGame.elevator_floor_selected.connect(on_elevator_floor_selected)
 	var pending: Variant = SaveManager.consume_pending_position()
 	if pending is Vector2:
 		$Player.global_position = pending
+	_make_moving_sky()
 	_place_ship_contents()
-	_first_waking_beat()
+
+func _make_moving_sky() -> void:
+	# Rob's star map, behind a cutout of the hull art (space bands made
+	# transparent). Once the ship is under way the stars slide, really
+	# really slowly - which is all "under way" needs to look like.
+	$CraftInterior.texture = load("res://astronaught/environs/rooms/craft_interior_cutout.png")
+	var layer := CanvasLayer.new()
+	layer.layer = -1
+	add_child(layer)
+	for i in 2:
+		var sky := Sprite2D.new()
+		sky.texture = load("res://astronaught/environs/new bg.png")
+		sky.centered = false
+		sky.position = Vector2(1920.0 * i, 0)
+		layer.add_child(sky)
+		_sky_sprites.append(sky)
+
+func _process(delta: float) -> void:
+	if not bool(GameState.get_flag("debris_cleared")):
+		return
+	for s in _sky_sprites:
+		s.position.x -= 3.0 * delta
+		if s.position.x <= -1920.0:
+			s.position.x += 3840.0
 
 func _place_ship_contents() -> void:
 	# --- Bottom deck: the working end.
@@ -58,10 +84,7 @@ func _place_ship_contents() -> void:
 			["mission_brief", "keycard_lab"],
 			"The mission brief, and a keycard clipped to it: Dr. E. Okonkwo, SCIENCE. She left it for whoever woke."),
 			Vector2(1450, DECK_TOP - 40))
-	_spot(FlavourSpot.make("Cryo bay", [
-		"Bays one and two are dark and cold and occupied. You let them be.",
-		"Your own pod stands open. It has already done its part.",
-	]), Vector2(900, DECK_TOP - 40))
+	_door("Cryo Bay", 860, DECK_TOP, "res://scenes/rooms/cryo_bay.tscn", Vector2(220, 631))
 	_spot(CoolantPanel.new(), Vector2(1010, DECK_TOP - 40))
 	_make_coolant_alarm(1010.0)
 	# --- Crawlspace.
@@ -221,16 +244,6 @@ class CoolantPanel extends Interactable:
 			Hud.computer_say("Embryo bay coolant: 61 percent and leaking politely. There is a depot moon on our route with reserves. When we are moving again, we stop there. I have already written it in the diary.")
 		else:
 			Hud.toast("COOLANT RESERVE: 61%. TREND: DOWN. A red light blinks above the panel, unhurried and certain.")
-
-func _first_waking_beat() -> void:
-	if bool(GameState.get_flag("woke_up")):
-		return
-	GameState.set_flag("woke_up")
-	Hud.toast("Cryo pod 4: cycle complete. Duration: rather longer than advertised.")
-	# The ship's mind is down. What answers is the watchdog: a smoke
-	# detector with a vocabulary. Restoring SOLACE is the first job.
-	Hud.computer_say("AUTONOMIC WATCHDOG ONLINE. PRIMARY INTELLIGENCE: OFFLINE. CAUSE: CORE FUSE FAILURE.")
-	Hud.computer_say("RESTORE SEQUENCE: SPARE FUSE - STORES CRATE, THIS DECK. CORE RACK - COCKPIT, DECK 3. END OF ASSISTANCE.")
 
 func on_elevator_floor_selected(floor_number: int) -> void:
 	for e in get_tree().get_nodes_in_group("Elevator"):

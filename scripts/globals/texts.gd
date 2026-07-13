@@ -60,11 +60,27 @@ Woke for scheduled rotation. Ship reports all nominal. Spent my four weeks runni
 Cryo bay 3 threw a fault during the night cycle. Fixed the coolant loop myself - two hours in the crawlspace with the wrench and some words I am not recording. The others sleep on. I have started narrating my movements aloud. The ship does not object.",
 			"Y204 D06
 
-The fault was not the coolant loop.
+The fault was not the coolant loop. It was the shared power bus, and it took three more days in the crawlspace to trace. Flagged for refit at the destination; full notes filed for whoever wakes next.
 
-I have moved what I can to bays 1 and 2 and written up full notes for whoever wakes next. Whoever you are: it was quiet, and they were asleep, and it was nobody's fault. Not even yours. Fix the ship. Finish the trip.
+If that bus ever fails for real, the pods will need splitting across separate circuits, fast. I hope whoever is awake when it happens is quicker than I was.
 
 The eggs are fine. Keep them that way.",
+		],
+	},
+	"osei_note": {
+		"title": "TO WHOEVER WAKES - R. OSEI, SYSTEMS",
+		"pages": [
+			"If you are reading this, the diagnostics were wrong about more than one of us, and I am glad beyond writing.
+
+I stayed awake after the strike. Someone had to. The pods lost their shared bus, so I split them across whatever circuits still held, the way Vashchenko's notes said to. It was not enough for Chen and Silva. I am sorry. It was quiet.",
+			"The diagnostics said it was not enough for anyone else either. It said this ship was carrying one living person, and that the person was me.
+
+There are people here. Where they are from and what they came for, I will let them explain - I am still not sure I believe it, and it is their story to tell. They have room for one more, pod and all.",
+			"The ship will hold. The watchdog is a blunt instrument but it does not sleep. If the mind ever comes back online, tell it Osei says the port bus junction is held together with hope and wire, in that order.
+
+Finish the trip. Somebody should.
+
+- R.O.",
 		],
 	},
 	"reprieve_captains_log": {
